@@ -22,24 +22,29 @@ def mainPage() {
 			if (debounce) {
 				input "delayTime", "number", title: "Enter number of milliseconds to delay for debounce", submitOnChange: true, defaultValue: 1000
 			}
-			input "chimeType", "enum", title: "Type of chime device", options: ["chime": "chime", "speachSynthesis": "TTS"], submitOnChange: true
+			input "chimeType", "enum", title: "Type of chime device", options: ["chime": "chime", "speachSynthesis": "TTS", "tone": "Tone/Beep"], submitOnChange: true
 			if (chimeType){
 				input "chimeDev", "capability.$chimeType", title: "Select Chime Device", submitOnChange:true, required: true, hideWhenEmpty: "chimeType"
 			}
-			if ((chimeDev) && (chimeType == "chime")) {
-				if (chimeDev.hasAttribute("soundEffects")) {
-                    def soundEffectsList = [:]
-                    for (soundEffect in chimeDev.currentState("soundEffects").getStringValue().minus("{").minus("}").split(",")) {
-						def effect = soundEffect.split("=")
-                        soundEffectsList.put(effect[0],effect[0] + " - " + effect[1]) 
-                    }         
-                    log.debug "sound effects list: " + soundEffectsList
-                    input "soundNum", "enum", title: "Sound to play", options: soundEffectsList, submitOnChange: true, required: true
-				} else {
-					input "soundNum", "number", title: "Sound to play", submitOnChange: true, required: true
+			if (chimeDev) {
+				switch (chimeType) {
+					case "chime":
+						if (chimeDev.hasAttribute("soundEffects")) {
+					    def soundEffectsList = [:]
+						for (soundEffect in chimeDev.currentState("soundEffects").getStringValue().minus("{").minus("}").split(",")) {
+							def effect = soundEffect.split("=")
+							soundEffectsList.put(effect[0],effect[0] + " - " + effect[1]) 
+						}         
+						log.debug "sound effects list: " + soundEffectsList
+						input "soundNum", "enum", title: "Sound to play", options: soundEffectsList, submitOnChange: true, required: true
+						} else {
+							input "soundNum", "number", title: "Sound to play", submitOnChange: true, required: true
+						}
+						break;
+					case "speachSynthesis":
+						input "speakText", "text", title: "Text to speak", submitOnChange: true, required: true
+						break;
 				}
-			} else if ((chimeDev) && (chimeType == "speachSynthesis")) {
-				input "speakText", "text", title: "Text to speak", submitOnChange: true, required: true
 			}
 		}
 	}
@@ -81,5 +86,21 @@ def debounced(data) {
 
 def chimeAction() {
 	log.debug "Chime Action"
-
+	switch(chimeType) {
+		case("chime"): 
+			//chime Type
+			log.debug "playing sound: $soundNum on " + chimeDev.getDisplayName()
+			chimeDev.playSound(soundNum.toInteger())
+			break;
+		case("speachSynthesis"):
+			// speach Type
+			log.debug "Speaking '$speakText' on " + chimeDev.getDisplayName()
+			chimeDev.speak(speakText)
+			break;
+		case("tone"):
+			// tone Type
+			log.debug "Sending beep to " + chimeDev.getDisplayName()
+			chimeDev.beep()
+			break;
+	}
 }
