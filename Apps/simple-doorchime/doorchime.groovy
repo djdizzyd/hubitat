@@ -23,7 +23,7 @@ def mainPage() {
 			if (debounce) {
 				input "delayTime", "number", title: "Enter number of milliseconds to delay for debounce", submitOnChange: true, defaultValue: 1000
 			}
-			input "chimeType", "enum", title: "Type of chime device", options: ["chime": "chime", "speachSynthesis": "TTS", "tone": "Tone/Beep"], submitOnChange: true
+			input "chimeType", "enum", title: "Type of chime device", options: ["chime": "chime", "speechSynthesis": "TTS", "tone": "Tone/Beep"], submitOnChange: true
 			if (chimeType){
 				input "chimeDev", "capability.$chimeType", title: "Select Chime Device", submitOnChange:true, required: true, hideWhenEmpty: "chimeType"
 			}
@@ -42,7 +42,7 @@ def mainPage() {
 							input "soundNum", "number", title: "Sound to play", submitOnChange: true, required: true
 						}
 						break;
-					case "speachSynthesis":
+					case "speechSynthesis":
 						input "speakText", "text", title: "Text to speak", submitOnChange: true, required: true
 						break;
 				}
@@ -93,8 +93,8 @@ def chimeAction() {
 			log.debug "playing sound: $soundNum on " + chimeDev.getDisplayName()
 			chimeDev.playSound(soundNum.toInteger())
 			break;
-		case("speachSynthesis"):
-			// speach Type
+		case("speechSynthesis"):
+			// speech Type
 			log.debug "Speaking '$speakText' on " + chimeDev.getDisplayName()
 			chimeDev.speak(speakText)
 			break;
