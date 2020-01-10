@@ -75,8 +75,8 @@ def logsOff(){
 
 def updated() {
 	log.info "updated().."
-	log.warn "debug logging is: ${logEnable == true}"
-	log.warn "color staging is: ${colorStaging == false}"
+	log.warn "debug logging is: ${logEnable}"
+	log.warn "color staging is: ${colorStaging}"
 	if (!state.powerStateMem) initializeVars()
 	if (state.powerStateMem.toInteger() != bulbMemory.toInteger()) device.configure() 
 	if (logEnable) runIn(1800,logsOff)
@@ -278,32 +278,33 @@ def setColor(value) {
 	def rgb = hubitat.helper.ColorUtils.hsvToRGB([value.hue, value.saturation, value.level])
     log.debug "r:" + rgb[0] + ", g: " + rgb[1] +", b: " + rgb[2]
 	result << zwave.switchColorV3.switchColorSet(red: rgb[0], green: rgb[1], blue: rgb[2], warmWhite:0, coldWhite:0)
-	result << zwave.switchMultilevelV3.switchMultilevelSet(value: value.level, dimmingDuration:1)
-	if ((device.currentValue("switch") != "on") && ((!colorStaging) || (device.currentValue("level") != value.level))) {
+	if ((device.currentValue("switch") != "on") && (!colorStaging)){
 		if (logEnable) log.debug "Bulb is off. Turning on"
  		result << zwave.basicV1.basicSet(value: 0xFF)
+        result << zwave.switchMultilevelV3.switchMultilevelGet()
 	}
-	commands(result + queryAllColors()+zwave.switchMultilevelV3.switchMultilevelGet())
+    commands(result+queryAllColors())
 }
 
 def setColorTemperature(temp) {
 	if (logEnable) log.debug "setColorTemperature($temp)"
-	def warmValue = temp < 5000 ? 255 : 0
-	def coldValue = temp >= 5000 ? 255 : 0
-	def parameterNumber = temp < 5000 ? WARM_WHITE_CONFIG : COLD_WHITE_CONFIG
-	def cmds = []
-    cmds << zwave.switchColorV3.switchColorSet(red: 0, green: 0, blue:0, warmWhite: warmValue, coldWhite: coldValue)
-    if (temp < COLOR_TEMP_MIN) temp = 2700
-    if (temp > COLOR_TEMP_MAX) temp = 6500
-	cmds << zwave.configurationV1.configurationSet([scaledConfigurationValue: temp, parameterNumber: parameterNumber, size:2])
-
-    if ((device.currentValue("switch") != "on") && (!colorStaging)) {
-		if (logEnable) log.debug "Bulb is off. Turning on"
-		cmds << zwave.basicV1.basicSet(value: 0xFF)
-		cmds << zwave.switchMultiLevelV3.switchMultilevelGet()
+	if ((device.currentValue("colorMode") != "CT") || (device.currentValue("colorTemperature") != temp)) {
+		def warmValue = temp < 5000 ? 255 : 0
+		def coldValue = temp >= 5000 ? 255 : 0
+		def parameterNumber = temp < 5000 ? WARM_WHITE_CONFIG : COLD_WHITE_CONFIG
+		def cmds = []
+		cmds << zwave.switchColorV3.switchColorSet(red: 0, green: 0, blue:0, warmWhite: warmValue, coldWhite: coldValue)
+		if (temp < COLOR_TEMP_MIN) temp = 2700
+		if (temp > COLOR_TEMP_MAX) temp = 6500
+		cmds << zwave.configurationV1.configurationSet([scaledConfigurationValue: temp, parameterNumber: parameterNumber, size:2])
+		if ((device.currentValue("switch") != "on") && (!colorStaging)) {
+			if (logEnable) log.debug "Bulb is off. Turning on"
+			cmds << zwave.basicV1.basicSet(value: 0xFF)
+			cmds << zwave.switchMultilevelV3.switchMultilevelGet()
+		}
+		commands(cmds + queryAllColors())
+        
 	}
-	commands(cmds + queryAllColors())
-	
 }
 
 private queryAllColors() {
@@ -425,8 +426,8 @@ def setGenericTempName(temp){
     else if (value < 20000) genericName = "Polar"
     def descriptionText = "${device.getDisplayName()} color is ${genericName}"
     if (txtEnable) log.info "${descriptionText}"
-    sendEvent(name: "colorName", value: genericName ,descriptionText: descriptionText)
 	sendEvent(name: "colorMode", value: "CT", descriptionText: "${device.getDisplayName()} color mode is CT")
+    sendEvent(name: "colorName", value: genericName ,descriptionText: descriptionText)
 }
 
 
@@ -468,5 +469,4 @@ def setGenericName(hue){
 	sendEvent(name: "colorMode", value: "RGB", descriptionText: "${device.getDisplayName()} color mode is RGB")
     sendEvent(name: "colorName", value: colorName ,descriptionText: descriptionText)
 }
-
 
