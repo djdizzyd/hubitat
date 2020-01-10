@@ -65,16 +65,16 @@ def initialize() {
     log.debug "initializing"
     for (dev in contactDev) {
         log.debug "subscribing to " + dev.getDisplayName()
-	    subscribe(dev, "contact", handler)
+	    subscribe(dev, "contact.open", handler)
     }
 }
 
 def handler(evt) {
 	if (debounce) {
-		runInMillis(delayTime, debounced, [data: [o: evt.value, d: evt.device]])
+		runInMillis(delayTime, debounced, [data: [o: evt.value, d: evt.device.getDisplayName()]])
 		log.info "Contact $evt.device $evt.value, start delay of $delayTime milliseconds"
 	} else {
-		debounced([o: evt.value, d: evt.device])
+		debounced([o: evt.value, d: evt.device.getDisplayName()])
 	}
 }
 
