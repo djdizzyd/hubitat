@@ -5,7 +5,8 @@ definition(
 	description: "Simple Door Chime App",
 	category: "Convenience",
 	iconUrl: "",
-	iconX2Url: ""
+	iconX2Url: "",
+	importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Apps/simple-doorchime/doorchime.groovy"
 )
 
 preferences {
