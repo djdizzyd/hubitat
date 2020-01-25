@@ -1,8 +1,0 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vs/hubitat/v16/.suo
-/.vs/ProjectSettings.json
-/.vs/VSWorkspaceState.json
-/.vs/slnx.sqlite
