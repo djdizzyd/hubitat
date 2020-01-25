@@ -22,20 +22,20 @@ def mainPage() {
     }
 }
 
-installed() {
+def installed() {
     initialize()
 }
 
-updated() {
+def updated() {
     initialize()
 }
 
-initialize() {
+def initialize() {
     def groupDev = getChildDevice("inovelli_group_notifier_$thisName")
 	if(!groupDev) groupDev = addChildDevice("djdizzyd", "Inovelli Group Notifier Child Device", "inovelli_group_notifier_$thisName", null, [label: thisName, name: thisName])
 }
 
-sendNotification(notificationText) {
+def sendNotification(notificationText) {
     def effectValue = parent.getEffect(notificationText)
     if (effectValue > 0) {
         for (dev in switchDevs) {

@@ -70,19 +70,19 @@ def mainPage() {
     }
 }
 
-installed() {
+def installed() {
     initialize()
 }
 
-updated() {
+def updated() {
     initialize()
 }
 
-getEffectValue() {
+def getEffectValue() {
     return calculateParameter()
 }
 
-initialize() {
+def initialize() {
     
 }
 

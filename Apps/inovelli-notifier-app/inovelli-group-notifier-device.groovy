@@ -6,5 +6,5 @@ metadata {
 }
 
 def deviceNotification(value) {
-    parent.sendNotification(device.getDisplayName(), value)
+    parent.sendNotification(value)
 }
