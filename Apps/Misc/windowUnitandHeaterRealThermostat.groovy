@@ -44,6 +44,8 @@ def updated() {
 	initialize()
 }
 
+
+
 def uninstalled() {
     unsubscribe()
     unschedule()
@@ -51,6 +53,15 @@ def uninstalled() {
     if (virtualThermostatDev) {
         deleteChildDevice(virtualThermostatDev.getDeviceNetworkId())
     }
+}
+
+def refreshThermostat() {
+    // on occasion I had a thermostat miss a message
+    if (realThermostat) {
+        thermostatDev.refresh()
+	} else {
+        tempDev.refresh()
+	}
 }
 
 def initialize() {
@@ -74,6 +85,7 @@ def initialize() {
         subscribe(virtualThermostatDev, "thermostatOperatingState", thermostatHandler)
         virtualThermostatDev.setTemperature(tempDev.currentValue("temperature"))
     }
+    runEvery30Minutes("refreshThermostat")
 }
 
 def tempHandler(evt) {
