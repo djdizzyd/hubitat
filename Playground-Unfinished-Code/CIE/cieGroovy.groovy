@@ -1,6 +1,4 @@
 def cieToRgb (x, y, Y=254) {
-	def x=0.45
-	def y=0.39
 	def z = 1.0 - x - y
 	def Y=1.0
 	def X=(Y/y) * x
