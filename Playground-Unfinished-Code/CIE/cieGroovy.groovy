@@ -41,3 +41,9 @@ def RgbToCie (r, g, b)
 	y = (Y/(X+Y+Z))
 	return (["x": x, "y": y])
 }
+
+def cieToCt(x,y) {
+	n = ((x-0.3320)/(0.1858-y))
+	CCT = (437*Math.pow(n,3))+(3601*Math.pow(n,2))+(6861*n)+5517
+	return Math.round(CCT)
+}
