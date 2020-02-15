@@ -6,7 +6,7 @@ import groovy.json.JsonOutput
 import hubitat.zigbee.zcl.DataType
  
 metadata {
-	definition (name: "My Centralite Thermostat", namespace: "djdizzyd", author: "Bryan Copeland", ocfDeviceType: "oic.d.thermostat") {
+	definition (name: "My Centralite Thermostat", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Centralite%20Pearl%20Thermostat/centraLitePearlThermostat.groovy") {
 		capability "Actuator"
 //        capability "Switch"
 		capability "Temperature Measurement"
