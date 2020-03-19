@@ -15,7 +15,9 @@ Some of my other releases / projects:
 
 [[SNEAK PEEK] Z-Wave firmware updating inside HE](https://community.hubitat.com/t/sneak-peek-z-wave-firmware-updating-inside-he/35836?u=bcopeland)
 
-# Other notable community development projects
+As well as contributions I have made to other community projects.
+
+# Other notable hubitat community development projects
 
 [Hubitat Community Apps](https://community.hubitat.com/t/community-apps/501?u=bcopeland)
 
