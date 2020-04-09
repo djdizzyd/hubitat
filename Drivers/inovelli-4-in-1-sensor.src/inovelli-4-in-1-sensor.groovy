@@ -22,11 +22,11 @@
  *              Fix illuminance scale.
  *              Options to enable & disable logging.
  *              Association support added for use with the Inovelli Z-Wave association tool.
- *  2020-04-09: Re-engineer of driver using current coding standards
- *              Reduce un-necessary event log chatter
- *              Add TamperAlert capability
- *              Standardize device info and add serialnumber, firmware version, protocol version, hardware version
- *              re-work of associations
+ *  2020-04-09: - bcopeland - Re-engineer of driver using current coding standards
+ *                            Reduce un-necessary event log chatter (there was a lot of this)
+ *                            Add TamperAlert capability
+ *                            Standardize device info and add serialnumber, firmware version, protocol version, hardware version
+ *                            Got rid of double / redundant motion events
  *
  */
 
@@ -210,7 +210,7 @@ void zwaveEvent(hubitat.zwave.commands.manufacturerspecificv2.DeviceSpecificRepo
 }
 
 void zwaveEvent(hubitat.zwave.commands.versionv2.VersionReport cmd) {
-    if (logEnable) log.debug "version3 report: ${cmd}"
+    if (logEnable) log.debug "version2 report: ${cmd}"
     device.updateDataValue("firmwareVersion", "${cmd.firmware0Version}.${cmd.firmware0SubVersion}")
     device.updateDataValue("protocolVersion", "${cmd.zWaveProtocolVersion}.${cmd.zWaveProtocolSubVersion}")
     device.updateDataValue("hardwareVersion", "${cmd.hardwareVersion}")
@@ -237,24 +237,10 @@ String secureCommand(hubitat.zwave.Command cmd) {
 }
 
 String secureCommand(String cmd) {
+    String encap = ""
     if (getDataValue("zwaveSecurePairingComplete") != "true") {
         return cmd
-    }
-    Short S2 = getDataValue("S2")?.toInteger()
-    String encap = ""
-    String keyUsed = "S0"
-    if (S2 == null) { //S0 existing device
-        encap = "988100"
-    } else if ((S2 & 0x04) == 0x04) { //S2_ACCESS_CONTROL
-        keyUsed = "S2_ACCESS_CONTROL"
-        encap = "9F0304"
-    } else if ((S2 & 0x02) == 0x02) { //S2_AUTHENTICATED
-        keyUsed = "S2_AUTHENTICATED"
-        encap = "9F0302"
-    } else if ((S2 & 0x01) == 0x01) { //S2_UNAUTHENTICATED
-        keyUsed = "S2_UNAUTHENTICATED"
-        encap = "9F0301"
-    } else if ((S2 & 0x80) == 0x80) { //S0 on C7
+    } else {
         encap = "988100"
     }
     return "${encap}${cmd}"
