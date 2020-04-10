@@ -416,7 +416,7 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
     switch (cmd.sensorType) {
         case 1:
             evt.name="temperature"
-            double realTemp=convertTemperatureIfNeeded(cmd.scaledSensorValue, cmd.scale == 1 ? "F" : "C", cmd.precision)
+            double realTemp=Double.parseDouble(convertTemperatureIfNeeded(cmd.scaledSensorValue, cmd.scale == 1 ? "F" : "C", cmd.precision))
             state.realTemperature = realTemp
             evt.value=getAdjustedTemp(realTemp)
             evt.unit=getTemperatureScale()
