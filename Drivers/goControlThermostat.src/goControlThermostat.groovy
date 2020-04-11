@@ -93,8 +93,9 @@ void logsOff(){
 
 void configure() {
 	if (!state.initialized) initializeVars()
-	runIn(10, syncClock)
-	runIn(5, pollDeviceData)
+	runIn(10, "syncClock")
+	runIn(5, "pollDeviceData")
+	runEvery3Hours("syncClock")
 }
 
 void initializeVars() {
@@ -119,7 +120,7 @@ void updated() {
 	unschedule()
 	if (logEnable) runIn(1800,logsOff)
 	runConfigs()
-	runIn(10, syncClock)
+	runEvery3Hours("syncClock")
 }
 
 void runConfigs() {
