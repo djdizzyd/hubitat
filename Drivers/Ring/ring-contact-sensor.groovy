@@ -111,6 +111,13 @@ void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpIntervalReport cmd) {
     state.wakeInterval=cmd.seconds
 }
 
+void eventProcess(Map evt) {
+    if (device.currentValue(evt.name).toString() != evt.value.toString()) {
+        evt.isStateChange=true
+        sendEvent(evt)
+    }
+}
+
 void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
     log.info "${device.displayName} Device wakeup notification"
 }
@@ -162,7 +169,7 @@ void zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
 }
 
 void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
-    Map evt = [name: "battery", unit: "%", isStateChange: true]
+    Map evt = [name: "battery", unit: "%"]
     if (cmd.batteryLevel == 0xFF) {
         evt.descriptionText = "${device.displayName} has a low battery"
         evt.value = "1"
@@ -171,7 +178,7 @@ void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
         evt.value = "${cmd.batteryLevel}"
     }
     if (txtEnable) log.info evt.descriptionText
-    sendEvent(evt)
+    eventProcess(evt)
 }
 
 void zwaveEvent(hubitat.zwave.commands.manufacturerspecificv2.DeviceSpecificReport cmd) {
@@ -431,7 +438,7 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
     }
     if (evt.isStateChange) {
         if (txtEnable) log.info evt.descriptionText
-        sendEvent(evt)
+        eventProcess(evt)
     }
 }
 
