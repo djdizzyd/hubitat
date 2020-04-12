@@ -186,7 +186,7 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
 			case 46:
 				// remote senor temp
 				if (scaledValue > 0) {
-					if (device.currentValue("remoteTemperature") != "${scaledValue}") sendEvent(name:"remoteTemperature", value: "${scaledValue}", unit: configParam7 == 1 ? "F" : "C")
+					eventProcess(name:"remoteTemperature", value: "${scaledValue}", unit: configParam7 == 1 ? "F" : "C")
 				}
 				break
 			case 52:
@@ -205,6 +205,13 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
 	}
 }
 
+void eventProcess(Map evt) {
+	if (device.currentValue(evt.name).toString() != evt.value.toString()) {
+		evt.isStateChange=true
+		sendEvent(evt)
+	}
+}
+
 void filterReset() {
 	List<hubitat.zwave.Command> cmds=[]
 	cmds.addAll(configCmd(52,2,0))
@@ -214,9 +221,9 @@ void filterReset() {
 private void filterCheck(hours) {
 	state.filterHours=hours
 	if (hours>configParam53) {
-		if (device.currentValue("filterStatus")!="replace") sendEvent(name: "filterStatus", value: "replace", isStateChange: true)
+		eventProcess(name: "filterStatus", value: "replace")
 	} else {
-		if (device.currentValue("filterStatus")!="normal") sendEvent(name: "filterStatus", value: "normal", isStateChange: true)
+		eventProcess(name: "filterStatus", value: "normal")
 	}
 }
 
@@ -230,7 +237,7 @@ private void scpUpdate(value) {
 	if ((value & (1L << 5)) != 0) scp.add("LAST")
 	if ((value & (1L << 6)) != 0) scp.add("MOT")
 	if ((value & (1L << 7)) != 0) scp.add("MRT")
-	if (device.currentValue("scpStatus") != scp.toString()) sendEvent(name: "scpStatus", value: scp.toString())
+	eventProcess(name: "scpStatus", value: scp.toString())
 }
 
 private void mechUpdate(value) {
@@ -244,7 +251,7 @@ private void mechUpdate(value) {
 	if ((value & (1L << 6)) != 0) mechStatus.add("MECH_F")
 	if ((value & (1L << 7)) != 0) mechStatus.add("MANUAL_F")
 	if ((value & (1L << 8)) != 0) mechStatus.add("reserved")
-	if (device.currentValue("mechStatus") != mechStatus.toString()) sendEvent(name: "mechStatus", value: mechStatus.toString())
+	eventProcess(name: "mechStatus", value: mechStatus.toString())
 }
 
 void pollDeviceData() {
@@ -388,7 +395,7 @@ void zwaveEvent(hubitat.zwave.commands.associationv2.AssociationGroupingsReport 
 
 void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
 	if (logEnable) log.debug "got battery report: ${cmd.batteryLevel}"
-	Map evt = [name: "battery", unit: "%", isStateChange: true]
+	Map evt = [name: "battery", unit: "%"]
 	if (cmd.batteryLevel == 0xFF) {
 		evt.descriptionText = "${device.displayName} has a low battery"
 		evt.value = "1"
@@ -397,13 +404,13 @@ void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
 		evt.value = "${cmd.batteryLevel}"
 	}
 	if (txtEnable) log.info evt.descriptionText
-	sendEvent(evt)
+	eventProcess(evt)
 }
 
 void zwaveEvent(hubitat.zwave.commands.sensormultilevelv1.SensorMultilevelReport cmd) {
 	if (cmd.sensorType.toInteger() == 1) {
 		if (logEnable) log.debug "got temp: ${cmd.scaledSensorValue}"
-		if (device.currentValue("temperature") != cmd.scaledSensorValue) sendEvent(name: "temperature", value: cmd.scaledSensorValue, unit: configParam7 == 1 ? "F" : "C", isStateChange: true)
+		eventProcess(name: "temperature", value: cmd.scaledSensorValue, unit: configParam7 == 1 ? "F" : "C")
 	}
 }
 
@@ -425,7 +432,7 @@ void setpointCalc(String newmode, String unit, value) {
 		mode=state.lastMode
 	}
 	if (newmode==mode) {
-		if (device.currentValue("thermostatSetpoint")!=value) sendEvent(name: "thermostatSetpoint", value: value, unit: unit, isStateChange: true)
+		eventProcess(name: "thermostatSetpoint", value: value, unit: unit)
 	}
 }
 
@@ -436,11 +443,11 @@ void zwaveEvent(hubitat.zwave.commands.thermostatsetpointv2.ThermostatSetpointRe
 	String unit=cmd.scale == 1 ? "F" : "C"
 	switch (cmd.setpointType) {
 		case 1:
-			if (device.currentValue("heatingSetpoint")!=cmd.scaledValue) sendEvent(name: "heatingSetpoint", value: cmd.scaledValue, unit: unit)
+			eventProcess(name: "heatingSetpoint", value: cmd.scaledValue, unit: unit)
 			setpointCalc("heat", unit, cmd.scaledValue)
 			break
 		case 2:
-			if (device.currentValue("coolingSetpoint")!=cmd.scaledValue) sendEvent(name: "coolingSetpoint", value: cmd.scaledValue, unit: unit)
+			eventProcess(name: "coolingSetpoint", value: cmd.scaledValue, unit: unit)
 			setpointCalc("cool", unit, cmd.scaledValue)
 			break
 	}
@@ -450,7 +457,7 @@ void zwaveEvent(hubitat.zwave.commands.thermostatoperatingstatev1.ThermostatOper
 	if (logEnable) log.debug "Got thermostat operating state report: ${cmd}"
 	String newstate=THERMOSTAT_OPERATING_STATE[cmd.operatingState.toInteger()]
 	if (logEnable) log.debug "Translated state: " + newstate
-	if (device.currentValue("thermostatOperatingState")!=newstate) sendEvent(name: "thermostatOperatingState", value: newstate, isStateChange: true)
+	eventProcess(name: "thermostatOperatingState", value: newstate)
 	if (newstate=="cooling") {
 		state.lastMode="cool"
 	} else if (newstate=="heating") {
@@ -475,14 +482,14 @@ void zwaveEvent(hubitat.zwave.commands.thermostatfanmodev1.ThermostatFanModeRepo
 	if (logEnable) log.debug "Got thermostat fan mode report: ${cmd}"
 	String newmode=THERMOSTAT_FAN_MODE[cmd.fanMode.toInteger()]
 	if (logEnable) log.debug "Translated fan mode: " + newmode
-	if (device.currentValue("thermostatFanMode")!=newmode) sendEvent(name: "thermostatFanMode", value: newmode)
+	eventProcess(name: "thermostatFanMode", value: newmode)
 }
 
 void zwaveEvent(hubitat.zwave.commands.thermostatmodev1.ThermostatModeReport cmd) {
 	if (logEnable) log.debug "Got thermostat mode report: ${cmd}"
 	String newmode=THERMOSTAT_MODE[cmd.mode.toInteger()]
 	if (logEnable) log.debug "Translated thermostat mode: " + newmode
-	if (device.currentValue("thermostatMode")!=newmode) sendEvent(name: "thermostatMode", value: newmode)
+	eventProcess(name: "thermostatMode", value: newmode)
 }
 
 void zwaveEvent(hubitat.zwave.commands.basicv1.BasicSet cmd) {
