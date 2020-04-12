@@ -410,7 +410,7 @@ void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
 void zwaveEvent(hubitat.zwave.commands.sensormultilevelv1.SensorMultilevelReport cmd) {
 	if (cmd.sensorType.toInteger() == 1) {
 		if (logEnable) log.debug "got temp: ${cmd.scaledSensorValue}"
-		eventProcess(name: "temperature", value: cmd.scaledSensorValue, unit: configParam7 == 1 ? "F" : "C")
+		eventProcess(name: "temperature", value: cmd.scaledSensorValue, unit: cmd.scale == 1 ? "F" : "C")
 	}
 }
 
