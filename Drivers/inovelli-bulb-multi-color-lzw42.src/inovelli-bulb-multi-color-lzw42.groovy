@@ -56,6 +56,7 @@
  *  	fixed fingerprint
  *  updated by bcopeland 4/12/2020
  *  	added duplicate event filtering (optional as it has a slight possibility of causing issues with voice assistants)
+ *  	changed dimming speed default to 1 to match previous default functionality
  */
 
 import groovy.transform.Field
@@ -82,7 +83,7 @@ metadata {
 		configParams.each { input it.value.input }
 		input name: "colorStaging", type: "bool", description: "", title: "Enable color pre-staging", defaultValue: false
 		input name: "colorTransition", type: "number", description: "", title: "Color fade time:", defaultValue: 0
-		input name: "dimmingSpeed", type: "number", description: "", title: "Dimming speed:", defaultValue: 0
+		input name: "dimmingSpeed", type: "number", description: "", title: "Dimming speed:", defaultValue: 1
 		input name: "eventFilter", type: "bool", title: "Filter out duplicate events", defaultValue: false
 		input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
 	}
