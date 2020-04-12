@@ -32,10 +32,10 @@ metadata {
 		fingerprint mfr:"014F", prod:"5442", deviceId:"5436", inClusters:"0x5E,0x59,0x5A,0x40,0x42,0x43,0x44,0x45,0x80,0x70,0x31,0x8F,0x86,0x72,0x85,0x2C,0x2B,0x73,0x81,0x7A", deviceJoinName: "GoControl GC-TBZ48"
 
 	}
-		preferences {
-			configParams.each { input it.value.input }
-			input "logEnable", "bool", title: "Enable debug logging", defaultValue: false
-		}
+	preferences {
+		configParams.each { input it.value.input }
+		input "logEnable", "bool", title: "Enable debug logging", defaultValue: false
+	}
             
 }
 
