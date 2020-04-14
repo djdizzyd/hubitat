@@ -16,6 +16,7 @@ metadata {
     }
     preferences {
         configParams.each { input it.value.input }
+        input name: "enableSwitch", type: "bool", title: "Enable power fail component switch", defaultValue: false
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
         input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
     }
@@ -52,6 +53,22 @@ void updated() {
     log.warn "description logging is: ${txtEnable == true}"
     unschedule()
     if (logEnable) runIn(1800,logsOff)
+    if (!enableSwitch) {
+        if (getChildDevice("${device.deviceNetworkId}-1")) {
+            deleteChildDevice("${device.deviceNetworkId}-1")
+        }
+    } else {
+        if(!getChildDevice("${device.deviceNetworkId}-1")) {
+            com.hubitat.app.ChildDeviceWrapper child=addChildDevice("hubitat", "Generic Component Switch", "${device.deviceNetworkId}-1", [completedSetup: true, label: "${device.displayName} (Power Fail Switch)", isComponent: true, componentName: "powerfail switch"])
+            if (device.currentValue("powerSource")) {
+                if (device.currentValue("powerSource")=="mains") {
+                    child.parse([[name: "switch", value: "on", isStateChange: true]])
+                } else {
+                    child.parse([[name: "switch", value: "off", isStateChange: true]])
+                }
+            }
+        }
+    }
     runConfigs()
 }
 
@@ -359,6 +376,12 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
                 evt.isStateChange=true
                 evt.value="battery"
                 evt.descriptionText="${device.displayName} AC mains disconnected"
+                if (enableSwitch) {
+                    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-1")
+                    if (child) {
+                        child.parse([[name: "switch", value: "off", isStateChange: true]])
+                    }
+                }
                 break
             case 3:
                 // AC mains re-connected
@@ -366,6 +389,12 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
                 evt.isStateChange=true
                 evt.value="mains"
                 evt.descriptionText="${device.displayName} AC mains re-connected"
+                if (enableSwitch) {
+                    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-1")
+                    if (child) {
+                        child.parse([[name: "switch", value: "on", isStateChange: true]])
+                    }
+                }
                 break
             case 4:
                 // surge detected
