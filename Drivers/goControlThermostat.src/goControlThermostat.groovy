@@ -70,7 +70,7 @@ metadata {
 		19: [input: [name: "configParam19", type: "number", title:"C Delta Stage 2 ON", description: "degrees", defaultValue: 2, range: "2..7"], parameterSize: 1],
 		20: [input: [name: "configParam20", type: "number", title:"C Delta Stage 2 OFF", description: "degrees", defaultValue: 0, range: "0..6"], parameterSize: 1],
 		24: [input: [name: "configParam24", type: "enum", title: "Display Lock", defaultValue: 0, options:[0:"Unlocked",1:"Locked"]], parameterSize: 1],
-		26: [input: [name: "configParam26", type: "number", title:"Backlight Timer", description: "seconds", defaultValue: 10, range: "10..30"], parameterSize: 1],
+		26: [input: [name: "configParam26", type: "number", title:"Backlight Timer", description: "seconds", defaultValue: 10, range: "0,10..30"], parameterSize: 1],
 		33: [input: [name: "configParam33", type: "number", title:"Max Heat Setpoint", description: "degrees", defaultValue: 109, range: "30..109"], parameterSize: 1],
 		34: [input: [name: "configParam34", type: "number", title:"Min Cool Setpoint", description: "degrees", defaultValue: 33, range: "33..112"], parameterSize: 1],
 		38: [input: [name: "configParam38", type: "enum", title: "Schedule Enable", defaultValue: 0, options: [0:"Disabled", 1:"Enabled"]], parameterSize:1],
