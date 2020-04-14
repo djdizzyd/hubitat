@@ -136,6 +136,13 @@ String secureCommand(String cmd) {
     return "${encap}${cmd}"
 }
 
+void eventProcess(Map evt) {
+    if (device.currentValue(evt.name).toString() != evt.value.toString()) {
+        evt.isStateChange=true
+        sendEvent(evt)
+    }
+}
+
 void zwaveEvent(hubitat.zwave.Command cmd) {
     if (logEnable) log.debug "skip:${cmd}"
 }
@@ -166,8 +173,8 @@ void zwaveEvent(hubitat.zwave.commands.associationv2.AssociationReport cmd) {
 
 void zwaveEvent(hubitat.zwave.commands.indicatorv3.IndicatorReport cmd) {
     if (cmd.value>0) {
-        sendEvent(name: "switch", value: "on", isStateChange: true)
+        eventProcess(name: "switch", value: "on", isStateChange: true)
     } else {
-        sendEvent(name: "switch", value: "off", isStateChange: true)
+        eventProcess(name: "switch", value: "off", isStateChange: true)
     }
 }
