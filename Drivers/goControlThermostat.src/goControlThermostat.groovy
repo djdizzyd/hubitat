@@ -564,14 +564,14 @@ void fanOn() {
 	setThermostatFanMode("on")
 }
 
-def fanAuto() {
+void fanAuto() {
 	setThermostatFanMode("auto")
 }
 
-def fanCirculate() {
+void fanCirculate() {
 	log.warn "fanCirculate is not supported by this device"
 }
 
-def setSchedule() {
+void setSchedule() {
 	log.warn "setSchedule is not supported by this driver"
 }
