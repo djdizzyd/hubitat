@@ -1,5 +1,5 @@
 /**
- *  Copyright 2019 Inovelli / Eric Maycock
+ *  Copyright 2020 Bryan Copeland
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -12,37 +12,8 @@
  *
  *  Inovelli Bulb Multi-Color LZW42
  *
- *  Author: Eric Maycock
- *  Date: 2019-9-9
- *  updated by bcopeland 1/7/2020
- *		Added color pre-staging option
- *		Added power restored memory configuration
- *		Added debug logging configuration
- *		Fixed color setting
- *		Fixed color temperature setting
- *		Fixed reporting
- *		Removed SmartThings related code
- *		Added importURL
- *		Added color name
- *	updated by bcopeland 1/9/2020
- *		added firmware version reporting
- *		fix for scene capture and level in setcolor
- *	updated by bcopeland 1/10/2020
- *		fix for hsl level from received color report
- *  updated by bcopeland 1/21/2020
- *		fixes for reported bugs
- *		correct comand class versions to match what the hardware supports
- *		add z-wave color component ids manually as it didnt seem to match in correct command class version from he
- *  updated by bcopeland 2/6/2020
- *      added ChangeLevel capability and relevant commands
- *  updated by bcopeland 2/15/2020
- *		dramatically improved speed of CT operations and reduced packet count - Make sure to hit configure after updating.
- *		improved speed of on/off events also reducing packets
- *		improved speed of setLevel events also reducing packets
- *		bug fix for null value in setColor
- *	updated by bcopeland 3/11/2020
- *		improved speed / reduced packets on CT set operations
- *		added color fade time preference for smoother CT transitions
+ *  As of 4/9/2020 there is no inovelli code remaining in this driver
+ *
  *	update by bcopeland 4/9/2020
  *      major re-write for new coding standards / cleanup
  *      stabilization of color temp and color reporting
@@ -57,20 +28,19 @@
  *  updated by bcopeland 4/12/2020
  *  	added duplicate event filtering (optional as it has a slight possibility of causing issues with voice assistants)
  *  	changed dimming speed default to 1 to match previous default functionality
- *  updated by InovelliUSA 4/15/2020
- *  	corrected incorrect options for parameter 2
  *  updated by bcopeland 4/15/2020
  *  	fixed bug in CT report
  *    	added gamma correction as an optional setting
  *  updated by bcopeland 4/16/2020
  *      updated ambiguous language
- *
+ *  updated by bcopeland 4/16/2020
+ *  	updated namespace and importUrl as I will no longer be maintaining code on inovelli official repo
  */
 
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Inovelli Bulb Multi-Color LZW42", namespace: "InovelliUSA", author: "InovelliUSA", importUrl: "https://raw.githubusercontent.com/InovelliUSA/Hubitat/master/Drivers/inovelli-bulb-multi-color-lzw42.src/inovelli-bulb-multi-color-lzw42.groovy") {
+    definition (name: "Inovelli Bulb Multi-Color LZW42", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/inovelli/inovelli-bulb-multi-color-lzw42.groovy") {
         capability "SwitchLevel"
         capability "ColorTemperature"
         capability "ColorControl"
