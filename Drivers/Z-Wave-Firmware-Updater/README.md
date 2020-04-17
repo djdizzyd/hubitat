@@ -33,3 +33,7 @@ After clicking the **Update Firmware** button this process can take a while.. Th
 
 ## Note for sleepy (battery powered) devices: ## 
 Throughout this process you may need to wake the device a few times before everything can be completed. Refer to the manual provided by the manufacturer for the wake mechanism for your device.
+
+To report any bugs or issues please use the original forum thread:
+https://community.hubitat.com/t/release-z-wave-firmware-updater/38237?u=bcopeland
+
