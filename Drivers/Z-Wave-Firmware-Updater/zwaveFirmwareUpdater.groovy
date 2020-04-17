@@ -1,4 +1,4 @@
-// v0.03b
+// v1.00
 import groovy.transform.Field
 
 metadata {
