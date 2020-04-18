@@ -13,7 +13,7 @@ Some of my other releases / projects:
 
 [[UPDATED] Inovelli Bulbs Drivers](https://community.hubitat.com/t/updated-inovelli-bulbs-drivers/30922?u=bcopeland)
 
-[[SNEAK PEEK] Z-Wave firmware updating inside HE](https://community.hubitat.com/t/sneak-peek-z-wave-firmware-updating-inside-he/35836?u=bcopeland)
+[[RELEASE] Z-Wave firmware updating inside HE](https://community.hubitat.com/t/release-z-wave-firmware-updater/38237?u=bcopeland)
 
 As well as contributions I have made to other community projects.
 
