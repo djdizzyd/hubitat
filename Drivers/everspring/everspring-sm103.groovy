@@ -72,7 +72,7 @@ void zwaveEvent(hubitat.zwave.commands.securityv1.SecurityMessageEncapsulation c
 }
 
 void parse(String description) {
-    if (logEnable) log.debug "parse:${description}"
+    log.debug "parse:${description}"
     hubitat.zwave.Command cmd = zwave.parse(description, CMD_CLASS_VERS)
     if (cmd) {
         zwaveEvent(cmd)
@@ -110,7 +110,7 @@ String secureCommand(String cmd) {
 }
 
 void zwaveEvent(hubitat.zwave.Command cmd) {
-    if (logEnable) log.debug "skip:${cmd}"
+    log.debug "skip:${cmd}"
 }
 
 void sensorValueEvent(value) {
@@ -122,22 +122,27 @@ void sensorValueEvent(value) {
 }
 
 void zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
+    log.debug "Basic report: ${cmd}"
     sensorValueEvent(cmd.value)
 }
 
 void zwaveEvent(hubitat.zwave.commands.basicv1.BasicSet cmd) {
+    log.debug "Basic set: ${cmd}"
     sensorValueEvent(cmd.value)
 }
 
 void zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
+    log.debug "switch binary report: ${cmd}"
     sensorValueEvent(cmd.value)
 }
 
 void zwaveEvent(hubitat.zwave.commands.sensorbinaryv1.SensorBinaryReport cmd) {
+    log.debug "sensor binary: ${cmd}"
     sensorValueEvent(cmd.sensorValue)
 }
 
 void zwaveEvent(hubitat.zwave.commands.sensoralarmv1.SensorAlarmReport cmd) {
+    log.debug "sensor alarm report ${cmd}"
     sensorValueEvent(cmd.sensorState)
 }
 
