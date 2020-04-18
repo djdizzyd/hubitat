@@ -5,7 +5,7 @@ import groovy.transform.Field
  */
 
 metadata {
-    definition (name: "Advanced Honeywell T6 Pro Thermostat", namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition (name: "Advanced Honeywell T6 Pro Thermostat", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Honeywell/Advanced-Honeywell-T6-Pro.groovy") {
 
         capability "Actuator"
         capability "Battery"
