@@ -2,7 +2,7 @@
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Z-Wave Firmware Updater",namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition (name: "Z-Wave Firmware Updater",namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Z-Wave-Firmware-Updater/zwaveFirmwareUpdater.groovy") {
         attribute "currentFirmwareVersion", "string"
         attribute "firmwareUpdateProgress", "string"
         attribute "firmwareUploadPercent", "string"
