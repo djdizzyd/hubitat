@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 metadata {
 
-    definition (name: "Aeotec Range Extender 7", namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition (name: "Aeotec Range Extender 7", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Aeotec-Range-Extender-7.src/Aeotec-Range-Extender-7.groovy") {
 
         capability "Actuator"
         capability "Configuration"
