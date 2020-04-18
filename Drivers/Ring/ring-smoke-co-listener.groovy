@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 metadata {
 
-    definition(name: "Ring Alarm Smoke/CO Listener", namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition(name: "Ring Alarm Smoke/CO Listener", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Ring/ring-smoke-co-listener.groovy") {
         capability "Actuator"
         capability "Sensor"
         capability "Configuration"

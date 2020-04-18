@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 metadata {
 
-    definition (name: "Ring Alarm Range Extender", namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition (name: "Ring Alarm Range Extender", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Ring/ring-range-extender.groovy") {
         capability "Actuator"
         capability "Refresh"
         capability "Sensor"

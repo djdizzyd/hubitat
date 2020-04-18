@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 metadata {
 
-    definition (name: "Ring Alarm Contact Sensor", namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition (name: "Ring Alarm Contact Sensor", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Ring/ring-contact-sensor.groovy") {
         capability "Actuator"
         capability "Sensor"
         capability "Configuration"
