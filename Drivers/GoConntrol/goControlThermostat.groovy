@@ -5,7 +5,7 @@ import groovy.transform.Field
  */
 
 metadata {
-    definition (name: "Advanced GoControl GC-TBZ48", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/goControlThermostat.src/goControlThermostat.groovy" ) {
+    definition (name: "Advanced GoControl GC-TBZ48", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/GoConntrol/goControlThermostat.groovy" ) {
 
         capability "Actuator"
         capability "Battery"
