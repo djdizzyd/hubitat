@@ -1,0 +1,18 @@
+{
+  "packageName": "Ring Smoke CO Listener",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-04-21",
+  "licenseFile": "",
+  "releaseNotes": "",
+  "drivers" : [
+    {
+      "id": "d3560ac5-f6ce-4a3e-9acd-8a52b7afc657",
+      "name": "Ring Smoke CO Listener",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Ring/ring-smoke-co-listener.groovy",
+      "required": true
+    }
+  ]
+}

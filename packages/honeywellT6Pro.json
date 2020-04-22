@@ -1,0 +1,18 @@
+{
+  "packageName": "Advanced Honeywell T6 Pro Thermostat",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-04-21",
+  "licenseFile": "",
+  "releaseNotes": "",
+  "drivers" : [
+    {
+      "id": "f1b16afc-8827-4fe9-9944-5e3814e8b2c5",
+      "name": "Advanced Honeywell T6 Pro Thermostat",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Honeywell/Advanced-Honeywell-T6-Pro.groovy",
+      "required": true
+    }
+  ]
+}

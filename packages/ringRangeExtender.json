@@ -1,0 +1,18 @@
+{
+  "packageName": "Ring Range Extender",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-04-21",
+  "licenseFile": "",
+  "releaseNotes": "",
+  "drivers" : [
+    {
+      "id": "3dea946f-d318-47b3-899e-604667343643",
+      "name": "Ring Range Extender",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Ring/ring-range-extender.groovy",
+      "required": true
+    }
+  ]
+}

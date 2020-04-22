@@ -1,0 +1,19 @@
+{
+  "author": "Bryan Copeland",
+  "gitHubUrl": "https://github.com/djdizzyd",
+  "payPalUrl": "https://ko-fi.com/A0A01MOZK",
+  "packages": [
+    {
+      "name": "Z-Wave Firmware Updater",
+      "category": "Utility",
+      "location": "https://raw.githubusercontent.com/package1/packageManifest.json",
+      "description": "This is Package 1"
+    },
+    {
+      "name": "Package 2",
+      "category": "Convenience",
+      "location": "https://raw.githubusercontent.com/package2/packageManifest.json",
+      "description": "This is Package 2"
+    }
+  ]
+}

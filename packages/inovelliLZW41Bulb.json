@@ -1,0 +1,18 @@
+{
+  "packageName": "Inovelli LZW41 Multi-White Bulb",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-04-21",
+  "licenseFile": "",
+  "releaseNotes": "",
+  "drivers" : [
+    {
+      "id": "10be05a4-f7fc-4318-a8d6-bbd12962d2d8",
+      "name": "Inovelli LZW41 Multi-White Bulb",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/inovelli/inovelli-bulb-multi-white-lzw41.groovy",
+      "required": true
+    }
+  ]
+}
