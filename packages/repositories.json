@@ -4,16 +4,70 @@
   "payPalUrl": "https://ko-fi.com/A0A01MOZK",
   "packages": [
     {
-      "name": "Z-Wave Firmware Updater",
-      "category": "Utility",
-      "location": "https://raw.githubusercontent.com/package1/packageManifest.json",
-      "description": "This is Package 1"
+      "name": "Aeotec Range Extender 7",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/aeotecRangeExtender7.json",
+      "description": "Aeotec Range Extender 7 Driver"
     },
     {
-      "name": "Package 2",
-      "category": "Convenience",
-      "location": "https://raw.githubusercontent.com/package2/packageManifest.json",
-      "description": "This is Package 2"
+      "name": "GoControl Thermostat",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/gocontrolThermostat.json",
+      "description": "Advanced GoControl GC-TBZ48 Thermostat Driver"
+    },
+    {
+      "name": "Honeywell T6 Pro Thermostat",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/gocontrolThermostat.json",
+      "description": "Advanced Honeywell T6 Pro Thermostat Driver"
+    },
+    {
+      "name": "Honeywell T6 Pro Thermostat",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/honeywellT6Pro.json",
+      "description": "Advanced Honeywell T6 Pro Thermostat Driver"
+    },
+    {
+      "name": "Inovelli Multi-White Bulb",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/inovelliLZW41Bulb.json",
+      "description": "Inovelli LZW41 Multi-White Bulb Driver"
+    },
+    {
+      "name": "Inovelli Multi-Color Bulb",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/inovelliLZW42Bulb.json",
+      "description": "Inovelli LZW42 Multi-Color Bulb Driver"
+    },
+    {
+      "name": "Ring Contact Sensor",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringContactSensor.json",
+      "description": "Ring Contact Sensor Driver"
+    },
+    {
+      "name": "Ring Motion Sensor",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringMotionSensor.json",
+      "description": "Ring Motion Sensor Driver"
+    },
+    {
+      "name": "Ring Range Extender",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringRangeExtender.json",
+      "description": "Ring Range Extender Driver"
+    },
+    {
+      "name": "Ring Smoke CO Listener",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringSmokeCOListener.json",
+      "description": "Ring Smoke CO Listener Driver"
+    },
+    {
+      "name": "Z-Wave Firmware Updater",
+      "category": "Utility",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zwaveFirmwareUpdater.json",
+      "description": "Z-Wave Firmware Updater Utility Driver"
     }
   ]
 }
