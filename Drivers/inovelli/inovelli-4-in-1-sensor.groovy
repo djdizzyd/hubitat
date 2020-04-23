@@ -104,7 +104,7 @@ void updated() {
     if (state.realTemperature != null) sendEvent(name:"temperature", value: getAdjustedTemp(state.realTemperature))
     if (state.realHumidity != null) sendEvent(name:"humidity", value: getAdjustedHumidity(state.realHumidity))
     if (state.realLuminance != null) sendEvent(name:"illuminance", value: getAdjustedLuminance(state.realLuminance))
-    runConfigs()
+    state.configUpdated=true
 }
 
 List<hubitat.zwave.Command> runConfigs() {
@@ -290,7 +290,7 @@ void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
     // let's do some wakeup stuff here
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.batteryV1.batteryGet())
-    cmds.addAll(runConfigs())
+    if(state.configUpdated) cmds.addAll(runConfigs())
     cmds.add(zwave.wakeUpV1.wakeUpNoMoreInformation())
     sendToDevice(cmds)
 }
