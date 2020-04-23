@@ -1,28 +1,7 @@
 /**
  *
  *  Inovelli 4-in-1 Sensor
- *
- *	github: InovelliUSA
- *	Date: 2020-01-28
- *	Copyright Inovelli / Eric Maycock
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License. You may obtain a copy of the License at:
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
- *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
- *  for the specific language governing permissions and limitations under the License.
- *
- *  2020-01-28: Update VersionReport parsing because of Hubitat change. Removing unnecessary reports.
- *
- *  2020-01-16: Support for all device configuration parameters.
- *              Offset options for temperature, humidity, and illuminance.
- *              Fix illuminance scale.
- *              Options to enable & disable logging.
- *              Association support added for use with the Inovelli Z-Wave association tool.
- *  2020-04-09: - bcopeland - Re-engineer of driver using current coding standards
+ *  2020-04-09: Re-engineer of driver using current coding standards
  *                            Reduce un-necessary event log chatter (there was a lot of this)
  *                            Add TamperAlert capability
  *                            Standardize device info and add serialnumber, firmware version, protocol version, hardware version
@@ -33,7 +12,7 @@
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Inovelli 4-in-1 Sensor", namespace: "InovelliUSA", author: "Eric Maycock", importUrl: "https://raw.githubusercontent.com/InovelliUSA/Hubitat/master/Drivers/inovelli-4-in-1-sensor.src/inovelli-4-in-1-sensor.groovy") {
+    definition (name: "Inovelli 4-in-1 Sensor", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/inovelli/inovelli-4-in-1-sensor.groovy") {
         capability "Actuator"
         capability "MotionSensor"
         capability "TemperatureMeasurement"
