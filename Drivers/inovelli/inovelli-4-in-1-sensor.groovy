@@ -269,7 +269,10 @@ void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
     // let's do some wakeup stuff here
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.batteryV1.batteryGet())
-    if(state.configUpdated) cmds.addAll(runConfigs())
+    if (state.configChange) {
+        cmds.addAll(runConfigs())
+        state.configChange=false
+    }
     cmds.add(zwave.wakeUpV1.wakeUpNoMoreInformation())
     sendToDevice(cmds)
 }
