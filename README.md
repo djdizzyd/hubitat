@@ -21,7 +21,9 @@ Some of my other releases / projects:
 
 [[RELEASE] Aeotec Range Extender 7 Driver](https://community.hubitat.com/t/release-aeotec-range-extender-7-driver/37775?u=bcopeland)
 
-[[RELEASE] Another GoControl GC-TBZ48 Thermostat Driver](https://community.hubitat.com/t/release-another-gocontrol-gc-tbz48-thermostat-driver/37868?u=bcopeland)
+[[RELEASE] Advanced GoControl GC-TBZ48 Thermostat Driver](https://community.hubitat.com/t/release-another-gocontrol-gc-tbz48-thermostat-driver/37868?u=bcopeland)
+
+[[RELEASE] Everspring ST815 Illumination Sensor](https://community.hubitat.com/t/release-everspring-st815-illumination-sensor/38799?u=bcopeland)
 
 As well as contributions I have made to other community projects.
 
