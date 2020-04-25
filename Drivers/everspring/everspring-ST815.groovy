@@ -16,7 +16,7 @@ metadata {
     }
 }
 
-@Field static Map CMD_CLASS_VERS = [0x20: 1, 0x25: 1, 0x30: 1, 0x31: 5, 0x80: 1, 0x84: 1, 0x71: 3, 0x9C: 1, 0x31:1, 0x86:1, 0x70:1]
+@Field static Map CMD_CLASS_VERS = [0x20: 1, 0x25: 1, 0x30: 1, 0x31: 5, 0x80: 1, 0x84: 2, 0x71: 1, 0x9C: 1, 0x31:1, 0x86:1, 0x70:1]
 
 @Field static Map configParams = [
         5: [input: [name: "configParam5", type: "number", title: "Auto Report", description: "(time interval) minutes 0-1439", range: "0..1439", defaultValue: 0], parameterSize: 2],
@@ -49,8 +49,8 @@ void updated() {
 
 void pollDeviceData() {
     List<hubitat.zwave.Command> cmds = []
-    cmds.add(zwave.wakeUpV1.wakeUpIntervalSet(seconds: 43200, nodeid:zwaveHubNodeId))
-    cmds.add(zwave.wakeUpV1.wakeUpIntervalGet())
+    cmds.add(zwave.wakeUpV2.wakeUpIntervalSet(seconds: 43200, nodeid:zwaveHubNodeId))
+    cmds.add(zwave.wakeUpV2.wakeUpIntervalGet())
     cmds.add(zwave.batteryV1.batteryGet())
     cmds.add(zwave.versionV1.versionGet())
     cmds.add(zwave.sensorMultilevelV1.sensorMultilevelGet())
@@ -159,13 +159,34 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv1.SensorMultilevelReport
     }
 }
 
-void zwaveEvent(hubitat.zwave.commands.wakeupv1.WakeUpNotification cmd) {
+void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.batteryV1.batteryGet())
     cmds.add(zwave.sensorMultilevelV1.sensorMultilevelGet())
-    if (state.configChange) cmds.addAll(runConfigs())
-    cmds.add(zwave.wakeUpV1.wakeUpNoMoreInformation())
+    if (state.configChange) {
+        cmds.addAll(runConfigs())
+        state.configChange=false
+    }
+    cmds.add(zwave.wakeUpV2.wakeUpNoMoreInformation())
     sendToDevice(cmds)
+}
+
+void zwaveEvent(hubitat.zwave.commands.alarmv1.AlarmReport cmd) {
+    if (cmd.alarmType==2 && cmd.alarmLevel==1) {
+        log.info "Device powerup"
+        pollDeviceData()
+        List<hubitat.zwave.Command> cmds=[]
+        cmds.add(zwave.wakeUpV2.wakeUpIntervalSet(seconds: 43200, nodeid:zwaveHubNodeId))
+        cmds.add(zwave.wakeUpV2.wakeUpIntervalGet())
+        cmds.add(zwave.batteryV1.batteryGet())
+        cmds.add(zwave.versionV1.versionGet())
+        cmds.add(zwave.sensorMultilevelV1.sensorMultilevelGet())
+        if (state.configChange) {
+            cmds.addAll(runConfigs())
+            state.configChange = false
+        }
+        sendToDevice(cmds)
+    }
 }
 
 void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
@@ -187,3 +208,4 @@ void eventProcess(Map evt) {
         sendEvent(evt)
     }
 }
+
