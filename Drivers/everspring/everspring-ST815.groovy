@@ -53,7 +53,7 @@ void pollDeviceData() {
     cmds.add(zwave.wakeUpV1.wakeUpIntervalGet())
     cmds.add(zwave.batteryV1.batteryGet())
     cmds.add(zwave.versionV1.versionGet())
-    cmds.add(zwave.sensorMultiLevelV1.sensorMultiLevelGet())
+    cmds.add(zwave.sensorMultilevelV1.sensorMultilevelGet())
     sendToDevice(cmds)
 }
 
@@ -61,7 +61,7 @@ void refresh() {
     List<hubitat.zwave.Command> cmds=[]
     log.info "${device.displayName}: refresh()"
     cmds.add(zwave.batteryV1.batteryGet())
-    cmds.add(zwave.sensorMultiLevelV1.sensorMultiLevelGet())
+    cmds.add(zwave.sensorMultilevelV1.sensorMultilevelGet())
     sendToDevice(cmds)
 }
 
@@ -162,7 +162,7 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv1.SensorMultilevelReport
 void zwaveEvent(hubitat.zwave.commands.wakeupv1.WakeUpNotification cmd) {
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.batteryV1.batteryGet())
-    cmds.add(zwave.sensorMultiLevelV1.sensorMultiLevelGet())
+    cmds.add(zwave.sensorMultilevelV1.sensorMultilevelGet())
     if (state.configChange) cmds.addAll(runConfigs())
     cmds.add(zwave.wakeUpV1.wakeUpNoMoreInformation())
     sendToDevice(cmds)
