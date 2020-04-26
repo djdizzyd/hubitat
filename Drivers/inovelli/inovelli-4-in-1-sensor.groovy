@@ -6,7 +6,7 @@
  *                            Add TamperAlert capability
  *                            Standardize device info and add serialnumber, firmware version, protocol version, hardware version
  *                            Got rid of double / redundant motion events
- *
+ *  2020-04-24: Fix Major bug
  */
 
 import groovy.transform.Field
@@ -36,6 +36,7 @@ metadata {
         input name: "humidityOffset", type: "number", title: "Humidity Offset", Description: "Adjust the reported humidity percentage by this positive or negative value Range: -10 ..10 Default: 0", range: "-10..10", defaultValue: 0
         input name: "luminanceOffset", type: "number", title: "Luminance Offset", Description: "Adjust the reported luminance by this positive or negative value Range: -100..100 Default: 0", range: "-100..100", defaultValue: 0
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
+        input name: "txtEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
 
@@ -79,9 +80,9 @@ void updated() {
     log.warn "debug logging is: ${logEnable == true}"
     unschedule()
     if (logEnable) runIn(1800,logsOff)
-    if (state.realTemperature != null) sendEvent(name:"temperature", value: getAdjustedTemp(state.realTemperature))
-    if (state.realHumidity != null) sendEvent(name:"humidity", value: getAdjustedHumidity(state.realHumidity))
-    if (state.realLuminance != null) sendEvent(name:"illuminance", value: getAdjustedLuminance(state.realLuminance))
+    if (state.realTemperature != null) eventProcess(name:"temperature", value: getAdjustedTemp(state.realTemperature))
+    if (state.realHumidity != null) eventProcess(name:"humidity", value: getAdjustedHumidity(state.realHumidity))
+    if (state.realLuminance != null) eventProcess(name:"illuminance", value: getAdjustedLuminance(state.realLuminance))
     state.configUpdated=true
 }
 
@@ -215,7 +216,7 @@ String secureCommand(hubitat.zwave.Command cmd) {
 }
 
 String secureCommand(String cmd) {
-    String encap = ""
+    String encap=""
     if (getDataValue("zwaveSecurePairingComplete") != "true") {
         return cmd
     } else {
@@ -223,6 +224,7 @@ String secureCommand(String cmd) {
     }
     return "${encap}${cmd}"
 }
+
 
 void zwaveEvent(hubitat.zwave.Command cmd) {
     if (logEnable) log.debug "skip:${cmd}"
@@ -268,10 +270,13 @@ void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
     // let's do some wakeup stuff here
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.batteryV1.batteryGet())
-    if (state.configChange) {
+    if (state.configUpdated) {
         cmds.addAll(runConfigs())
-        state.configChange=false
+        state.configUpdated=false
     }
+    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(sensorType:1, scale:1))
+    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(sensorType:3, scale:1))
+    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(sensorType:5, scale:1))
     cmds.add(zwave.wakeUpV1.wakeUpNoMoreInformation())
     sendToDevice(cmds)
 }
@@ -286,7 +291,7 @@ void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
         evt.value = "${cmd.batteryLevel}"
     }
     if (txtEnable) log.info evt.descriptionText
-    sendEvent(evt)
+    eventProcess(evt)
 }
 
 void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
@@ -387,7 +392,7 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
     }
     if (evt.isStateChange) {
         if (txtEnable) log.info evt.descriptionText
-        sendEvent(evt)
+        eventProcess(evt)
     }
 }
 
@@ -417,11 +422,19 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
             state.realHumidity = cmd.scaledSensorValue.toInteger()
             evt.value = getAdjustedHumidity(cmd.scaledSensorValue.toInteger())
             evt.unit = "%"
+            evt.isStateChange=true
             evt.description="${device.displayName}: Humidity report received: ${evt.value}"
             break;
     }
     if (evt.isStateChange) {
         if (txtEnable) log.info evt.descriptionText
+        eventProcess(evt)
+    }
+}
+
+void eventProcess(Map evt) {
+    if (device.currentValue(evt.name).toString() != evt.value.toString()) {
+        evt.isStateChange=true
         sendEvent(evt)
     }
 }
