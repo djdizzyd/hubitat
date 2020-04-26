@@ -36,7 +36,6 @@ metadata {
         input name: "humidityOffset", type: "number", title: "Humidity Offset", Description: "Adjust the reported humidity percentage by this positive or negative value Range: -10 ..10 Default: 0", range: "-10..10", defaultValue: 0
         input name: "luminanceOffset", type: "number", title: "Luminance Offset", Description: "Adjust the reported luminance by this positive or negative value Range: -100..100 Default: 0", range: "-100..100", defaultValue: 0
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
-        input name: "txtEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
 
