@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 0.01B
+*	version: 0.02B
 */
 
 import groovy.transform.Field
@@ -21,7 +21,7 @@ metadata {
     }
     preferences {
         configParams.each { input it.value.input }
-        input name: "associationsG2", type: "string", description: "To add nodes to associations use the Hexidecimal nodeID from the z-wave device list separated by commas into the space below", title: "Associations Group 2", required: true
+        input name: "associationsG2", type: "string", description: "To add nodes to associations use the Hexidecimal nodeID from the z-wave device list separated by commas into the space below", title: "Associations Group 2"
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
