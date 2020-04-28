@@ -1,3 +1,8 @@
+/*
+*	Zen27 Central Scene Dimmer
+*	version: 0.01B
+*/
+
 import groovy.transform.Field
 
 metadata {
