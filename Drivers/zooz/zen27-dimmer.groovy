@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 0.02B
+*	version: 0.03B
 */
 
 import groovy.transform.Field
@@ -15,6 +15,7 @@ metadata {
         capability "Configuration"
         capability "ChangeLevel"
         capability "PushableButton"
+        capability "Indicator"
 
         fingerprint mfr:"027A", prod:"A000", deviceId:"A002", inClusters:"0x5E,0x26,0x85,0x8E,0x59,0x55,0x86,0x72,0x5A,0x73,0x70,0x5B,0x9F,0x6C,0x7A", deviceJoinName: "Zooz Zen27 Dimmer" //US
 
@@ -22,6 +23,7 @@ metadata {
     preferences {
         configParams.each { input it.value.input }
         input name: "associationsG2", type: "string", description: "To add nodes to associations use the Hexidecimal nodeID from the z-wave device list separated by commas into the space below", title: "Associations Group 2"
+        input name: "associationsG3", type: "string", description: "To add nodes to associations use the Hexidecimal nodeID from the z-wave device list separated by commas into the space below", title: "Associations Group 3"
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
@@ -49,6 +51,7 @@ metadata {
         22: [input: [name: "configParam22", type: "number", title: "Night Light Mode", description: "0 – feature disabled; 1 – 99 (%). Default: 20", defaultValue: 20, ranges: "0..99"], parameterSize:1]
 ]
 @Field static Map CMD_CLASS_VERS=[0x20:1,0x5B:3,0x86:3,0x72:2,0x8E:3,0x85:2,0x59:1,0x26:2,0x70:1]
+@Field static int numberOfAssocGroups=3
 void logsOff(){
     log.warn "debug logging disabled..."
     device.updateSetting("logEnable",[value:"false",type:"bool"])
@@ -101,6 +104,18 @@ List<hubitat.zwave.Command> configCmd(parameterNumber, size, scaledConfiguration
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: parameterNumber.toInteger(), size: size.toInteger(), scaledConfigurationValue: scaledConfigurationValue.toInteger()))
     cmds.add(zwave.configurationV1.configurationGet(parameterNumber: parameterNumber.toInteger()))
     return cmds
+}
+
+void indicatorNever() {
+    sendToDevice(configCmd(2,1,2))
+}
+
+void indicatorWhenOff() {
+    sendToDevice(configCmd(2,1,0))
+}
+
+void indicatorWhenOn() {
+    sendToDevice(configCmd(2,1,1))
 }
 
 void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) {
@@ -279,38 +294,40 @@ List<hubitat.zwave.Command> setDefaultAssociation() {
 List<hubitat.zwave.Command> processAssociations(){
     List<hubitat.zwave.Command> cmds = []
     cmds.addAll(setDefaultAssociation())
-    if (logEnable) log.debug "group: 2 dataValue: " + getDataValue("zwaveAssociationG2") + " parameterValue: " + settings."associationsG2"
-    String parameterInput=settings."associationsG2"
-    List<String> newNodeList = []
-    List<String> oldNodeList = []
-    if (getDataValue("zwaveAssociationG2") != null) {
-        getDataValue("zwaveAssociationG2").minus("[").minus("]").split(",").each {
-            if (it!="") {
-                oldNodeList.add(it.minus(" "))
+    for (int i = 2; i<=numberOfAssocGroups; i++) {
+        if (logEnable) log.debug "group: $i dataValue: " + getDataValue("zwaveAssociationG$i") + " parameterValue: " + settings."associationsG$i"
+        String parameterInput=settings."associationsG$i"
+        List<String> newNodeList = []
+        List<String> oldNodeList = []
+        if (getDataValue("zwaveAssociationG$i") != null) {
+            getDataValue("zwaveAssociationG$i").minus("[").minus("]").split(",").each {
+                if (it != "") {
+                    oldNodeList.add(it.minus(" "))
+                }
             }
         }
-    }
-    if (parameterInput!=null) {
-        parameterInput.minus("[").minus("]").split(",").each {
-            if (it!="") {
-                newNodeList.add(it.minus(" "))
+        if (parameterInput != null) {
+            parameterInput.minus("[").minus("]").split(",").each {
+                if (it != "") {
+                    newNodeList.add(it.minus(" "))
+                }
             }
         }
-    }
-    if (oldNodeList.size > 0 || newNodeList.size > 0) {
-        if (logEnable) log.debug "${oldNodeList.size} - ${newNodeList.size}"
-        oldNodeList.each {
-            if (!newNodeList.contains(it)) {
-                // user removed a node from the list
-                if (logEnable) log.debug "removing node: $it, from group: 2"
-                cmds.add(zwave.associationV2.associationRemove(groupingIdentifier:2, nodeId:Integer.parseInt(it,16)))
+        if (oldNodeList.size > 0 || newNodeList.size > 0) {
+            if (logEnable) log.debug "${oldNodeList.size} - ${newNodeList.size}"
+            oldNodeList.each {
+                if (!newNodeList.contains(it)) {
+                    // user removed a node from the list
+                    if (logEnable) log.debug "removing node: $it, from group: $i"
+                    cmds.add(zwave.associationV2.associationRemove(groupingIdentifier: i, nodeId: Integer.parseInt(it, 16)))
+                }
+            }
+            newNodeList.each {
+                cmds.add(zwave.associationV2.associationSet(groupingIdentifier: i, nodeId: Integer.parseInt(it, 16)))
             }
         }
-        newNodeList.each {
-            cmds.add(zwave.associationV2.associationSet(groupingIdentifier:2, nodeId:Integer.parseInt(it,16)))
-        }
+        cmds.add(zwave.associationV2.associationGet(groupingIdentifier: i))
     }
-    cmds.add(zwave.associationV2.associationGet(groupingIdentifier: 2))
     if (logEnable) log.debug "processAssociations cmds: ${cmds}"
     return cmds
 }
