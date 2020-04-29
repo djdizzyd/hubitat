@@ -1,5 +1,5 @@
 /*
-*	Zen27 Central Scene Switch
+*	Zen26 Central Scene Switch
 *	version: 0.01B
 */
 
