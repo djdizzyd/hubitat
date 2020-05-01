@@ -57,11 +57,14 @@ metadata {
                 // Color, or Color Temperature Model-specific settings
                 input name: "colorPrestage", type: "bool", description: "", title: "Enable Color Prestaging", defaultValue: false, required: true
                 input name: "colorDuration", type: "number", description: "", title: "Color Transition Duration", defaultValue: 3, required: true
+                input name: "wwKelvin", type: "number", description: "", title: "Warm White Temperature", defaultValue: 2700, required: true
+            }
+            if (getDataValue("deviceModel")=="1") {
+                input name: "cwKelvin", type: "number", description: "", title: "Cold White Temperature", defaultValue: 6500, required: true
             }
             if (getDataValue("deviceModel")=="2") {
                 // Color Model-specific settings
                 input name: "wwComponent", type: "bool", description: "", title: "Enable Warm White Component", defaultValue: true, required: true
-                input name: "wwKelvin", type: "number", description: "", title: "Warm White Temperature", defaultValue: 2700, required: true
                 input name: "enableGammaCorrect", type: "bool", description: "May cause a slight difference in reported color", title: "Enable gamma correction on setColor", defaultValue: false, required: true
             }
             input name: "stageModeSpeed", type: "number", description: "", title: "Light Effect Speed 0-255 (default 243)", defaultValue: 243, required: true
@@ -102,7 +105,7 @@ metadata {
         7:"Random Mode"
 ]
 private int getCOLOR_TEMP_DIFF_RGBW() {  COLOR_TEMP_MAX - wwKelvin }
-private int getCOLOR_TEMP_DIFF() {  COLOR_TEMP_MAX - COLOR_TEMP_MIN }
+private int getCOLOR_TEMP_DIFF() {  (cwKelvin?cwKelvin.toInteger():COLOR_TEMP_MAX) - (wwKelvin?wwKelvin.toInteger():COLOR_TEMP_MIN) }
 
 void logsOff(){
     log.warn "debug logging disabled..."
@@ -347,9 +350,9 @@ void zwaveEvent(hubitat.zwave.commands.switchcolorv3.SwitchColorReport cmd) {
                 // Got all CCT colors
                 int warmWhite = state.colorReceived["warmWhite"]
                 int coldWhite = state.colorReceived["coldWhite"]
-                int colorTemp = COLOR_TEMP_MIN + (COLOR_TEMP_DIFF / 2)
+                int colorTemp = (wwKelvin?wwKelvin.toInteger():COLOR_TEMP_MIN) + (COLOR_TEMP_DIFF / 2)
                 if (warmWhite != coldWhite) {
-                    colorTemp = (COLOR_TEMP_MAX - (COLOR_TEMP_DIFF * warmWhite) / 255) as Integer
+                    colorTemp = ((cwKelvin?cwKelvin.toInteger():COLOR_TEMP_MAX) - (COLOR_TEMP_DIFF * warmWhite) / 255) as Integer
                 }
                 eventProcess(name: "colorTemperature", value: colorTemp)
                 // clear state values
@@ -523,8 +526,16 @@ void setColorTemperature(temp) {
     int duration=colorDuration?colorDuration:3
     int warmWhite=0
     int coldWhite=0
-    if(temp > COLOR_TEMP_MAX) temp = COLOR_TEMP_MAX
-    if(temp < COLOR_TEMP_MIN) temp = COLOR_TEMP_MIN
+    if (!cwKelvin) {
+        if (temp > COLOR_TEMP_MAX) temp = COLOR_TEMP_MAX
+    } else {
+        if (temp > cwKelvin) temp = cwKelvin
+    }
+    if (!wwKelvin) {
+        if (temp < COLOR_TEMP_MIN) temp = COLOR_TEMP_MIN
+    } else {
+        if (temp < wwKelvin) temp = wwKelvin
+    }
     List<hubitat.zwave.Command> cmds = []
     if(logEnable) log.debug "setColorTemperature($temp)"
     switch (getDataValue("deviceModel")) {
@@ -536,8 +547,9 @@ void setColorTemperature(temp) {
         case "1":
             // Full CCT Devie Type
             state.ctTarget=temp
-            warmValue = ((COLOR_TEMP_MAX - temp) / COLOR_TEMP_DIFF * 255) as Integer
+            warmValue = (((cwKelvin?cwKelvin.toInteger():COLOR_TEMP_MAX) - temp) / COLOR_TEMP_DIFF * 255) as Integer
             coldValue = 255 - warmValue
+            log.debug "temp: $temp - warm: $warmValue - cold: $coldValue ctDiff: $COLOR_TEMP_DIFF"
             cmds.add(zwave.switchColorV3.switchColorSet(warmWhite: warmValue, coldWhite: coldValue, dimmingDuration: duration))
             break
         case "2":
@@ -567,6 +579,7 @@ void setColorTemperature(temp) {
     }
     cmds.addAll(queryAllColors())
     eventProcess(name: "colorMode", value: "CT")
+    log.debug(cmds)
     sendToDevice(cmds)
 }
 
