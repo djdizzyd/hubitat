@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 /**
  * Advanced GoControl GC-TBZ48 Thermostat Driver
- * v1.2
+ * v1.3
  * updated 2020-05-01
  */
 
@@ -160,8 +160,12 @@ List<hubitat.zwave.Command> pollConfigs() {
 List<hubitat.zwave.Command> configCmd(parameterNumber, size, scaledConfigurationValue) {
     List<hubitat.zwave.Command> cmds = []
     int intval=scaledConfigurationValue.toInteger()
-    if (intval<0) intval=256 + intval
-    cmds.add(zwave.configurationV1.configurationSet(parameterNumber: parameterNumber.toInteger(), size: size.toInteger(), scaledConfigurationValue: intval))
+    if (size==1) {
+        if (intval < 0) intval = 256 + intval
+        cmds.add(zwave.configurationV1.configurationSet(parameterNumber: parameterNumber.toInteger(), size: size.toInteger(), configurationValue: [intval]))
+    } else {
+        cmds.add(zwave.configurationV1.configurationSet(parameterNumber: parameterNumber.toInteger(), size: size.toInteger(), scaledConfigurationValue: intval))
+    }
     cmds.add(zwave.configurationV1.configurationGet(parameterNumber: parameterNumber.toInteger()))
     return cmds
 }
