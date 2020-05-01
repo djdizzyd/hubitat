@@ -5,6 +5,7 @@
 *   Updated 2020-02-26 Added importUrl and optional gamma correction on setColor events
 *   Updated 2020-04-08 Update to current coding standards
 *   Updated 2020-04-11 Added duplicate event filtering
+*   Updated 2020-04-30 Updated CCT Range
 *
 */
 
