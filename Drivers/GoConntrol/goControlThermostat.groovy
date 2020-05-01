@@ -185,7 +185,7 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
                 }
             }
         }
-        if (cmd.parmeterNumber==48) {
+        if (cmd.parameterNumber==48) {
             eventProcess(name: "currentSensorCal", value: scaledValue)
         }
         device.updateSetting(configParam.input.name, [value: "${scaledValue}", type: configParam.input.type])
