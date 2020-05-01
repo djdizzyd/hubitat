@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 /**
  * Advanced GoControl GC-TBZ48 Thermostat Driver
- * v1.3
+ * v1.4
  * updated 2020-05-01
  */
 
@@ -77,8 +77,8 @@ metadata {
         20: [input: [name: "configParam20", type: "number", title:"C Delta Stage 2 OFF", description: "degrees", defaultValue: 0, range: "0..6"], parameterSize: 1],
         24: [input: [name: "configParam24", type: "enum", title: "Display Lock", defaultValue: 0, options:[0:"Unlocked",1:"Locked"]], parameterSize: 1],
         26: [input: [name: "configParam26", type: "number", title:"Backlight Timer", description: "seconds", defaultValue: 10, range: "0,10..30"], parameterSize: 1],
-        33: [input: [name: "configParam33", type: "number", title:"Max Heat Setpoint", description: "degrees", defaultValue: 109, range: "30..109"], parameterSize: 1],
-        34: [input: [name: "configParam34", type: "number", title:"Min Cool Setpoint", description: "degrees", defaultValue: 33, range: "33..112"], parameterSize: 1],
+        33: [input: [name: "configParam33", type: "number", title:"Max Heat Setpoint", description: "degrees", defaultValue: 90, range: "30..109"], parameterSize: 1],
+        34: [input: [name: "configParam34", type: "number", title:"Min Cool Setpoint", description: "degrees", defaultValue: 60, range: "33..112"], parameterSize: 1],
         38: [input: [name: "configParam38", type: "enum", title: "Schedule Enable", defaultValue: 0, options: [0:"Disabled", 1:"Enabled"]], parameterSize:1],
         39: [input: [name: "configParam39", type: "enum", title: "Run/Hold Mode", defaultValue: 0, options: [0:"Hold", 1:"Run"]], parameterSize:1],
         40: [input: [name: "configParam40", type: "enum", title: "Setback Mode", defaultValue: 0, options: [0:"No Setback", 1:"Un-Occupied Mode"]], parameterSize:1],
@@ -88,8 +88,8 @@ metadata {
         48: [input: [name: "configParam48", type: "number", title:"Internal Sensor Temp Offset", description: "degrees", defaultValue: 0, range: "-7..7"], parameterSize: 1],
         49: [input: [name: "configParam49", type: "number", title:"Remote Sensor Temp Offset", description: "degrees", defaultValue: 0, range: "-7..7"], parameterSize: 1],
         53: [input: [name: "configParam53", type: "number", title:"Filter Timer Max (hrs)", description: "hours", defaultValue: 4000, range: "0..4000"], parameterSize: 2],
-        61: [input: [name: "configParam61", type: "number", title:"Fan Purge Heat", description: "degrees", defaultValue: 90, range: "0..90"], parameterSize: 1],
-        62: [input: [name: "configParam62", type: "number", title:"Fan Purge Cool", description: "degrees", defaultValue: 90, range: "0..90"], parameterSize: 1],
+        61: [input: [name: "configParam61", type: "number", title:"Fan Purge Heat", description: "seconds", defaultValue: 90, range: "0..90"], parameterSize: 1],
+        62: [input: [name: "configParam62", type: "number", title:"Fan Purge Cool", description: "seconds", defaultValue: 90, range: "0..90"], parameterSize: 1],
         186: [input: [name: "configParam182", type: "number", title:"Temperature Report Threshold", description: "degrees", defaultValue: 1, range: "1..5"], parameterSize: 1],
         187: [input: [name: "configParam187", type: "number", title:"Temperature Report Periodic", description: "minutes", defaultValue: 0, range: "0..120"], parameterSize: 1]
 ]
