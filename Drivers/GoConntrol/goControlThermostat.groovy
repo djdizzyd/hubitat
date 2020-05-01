@@ -168,7 +168,7 @@ List<hubitat.zwave.Command> configCmd(parameterNumber, size, scaledConfiguration
 
 void SensorCal(value) {
     if (logEnable) log.debug "SensorCal($value)"
-    List<hubitiat.zwave.Command> cmds=[]
+    List<hubitat.zwave.Command> cmds=[]
     cmds.addAll(configCmd(48,1,value))
     sendToDevice(cmds)
 }
