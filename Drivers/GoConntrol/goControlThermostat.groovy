@@ -25,9 +25,13 @@ metadata {
         attribute "scpStatus", "string"
         attribute "mechStatus", "string"
         attribute "remoteTemperature", "string"
+        attribute "currentSensorCal", "number"
+
 
         command "syncClock"
         command "filterReset"
+        command "SensorCal", [[name:"calibration",type:"ENUM", description:"Number of degrees to add/subtract from thermostat sensor", constraints:["0", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7"]]]
+
 
         fingerprint mfr:"014F", prod:"5442", deviceId:"5436", inClusters:"0x5E,0x59,0x5A,0x40,0x42,0x43,0x44,0x45,0x80,0x70,0x31,0x8F,0x86,0x72,0x85,0x2C,0x2B,0x73,0x81,0x7A", deviceJoinName: "GoControl GC-TBZ48"
 
@@ -160,6 +164,13 @@ List<hubitat.zwave.Command> configCmd(parameterNumber, size, scaledConfiguration
     return cmds
 }
 
+void SensorCal(value) {
+    if (logEnable) log.debug "SensorCal($value)"
+    List<hubitiat.zwave.Command> cmds=[]
+    cmds.addAll(configCmd(48,1,value))
+    sendToDevice(cmds)
+}
+
 void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) {
     int scaledValue
     cmd.configurationValue.reverse().eachWithIndex { v, index -> scaledValue=scaledValue | v << (8*index) }
@@ -171,6 +182,9 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
                     scaledValue = scaledValue - 256
                 }
             }
+        }
+        if (cmd.parmeterNumber==48) {
+            eventProcess(name: "currentSensorCal", value: scaledValue)
         }
         device.updateSetting(configParam.input.name, [value: "${scaledValue}", type: configParam.input.type])
     } else {
