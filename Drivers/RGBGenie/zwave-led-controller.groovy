@@ -256,7 +256,7 @@ void updated() {
         cmds.add(zwave.configurationV2.configurationGet(parameterNumber: 4))
     }
     cmds.add(zwave.configurationV2.configurationSet(parameterNumber: 2, size: 1, scaledConfigurationValue: loadStateSave.toInteger()))
-    cmds.add(zwave.configurationV2.configurationSet(parameterNumber: 6, size: 1, configurationValue: stageModeSpeed.toInteger()))
+    cmds.add(zwave.configurationV2.configurationSet(parameterNumber: 6, size: 1, configurationValue: [stageModeSpeed.toInteger()]))
     cmds.add(zwave.configurationV2.configurationSet(parameterNumber: 8, size: 1, scaledConfigurationValue: hueToHueByte(stageModeHue.toInteger())))
     sendToDevice(cmds)
 }
