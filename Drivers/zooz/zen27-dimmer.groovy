@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 0.04B
+*	version: 0.05B
 */
 
 import groovy.transform.Field
@@ -25,6 +25,7 @@ metadata {
         input name: "associationsG2", type: "string", description: "To add nodes to associations use the Hexidecimal nodeID from the z-wave device list separated by commas into the space below", title: "Associations Group 2"
         input name: "associationsG3", type: "string", description: "To add nodes to associations use the Hexidecimal nodeID from the z-wave device list separated by commas into the space below", title: "Associations Group 3"
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
+        input name: "txtEnable", type: "bool", title: "Enable text logging", defaultValue: false
     }
 }
 @Field static Map configParams = [
@@ -177,10 +178,14 @@ void zwaveEvent(hubitat.zwave.commands.switchmultilevelv2.SwitchMultilevelReport
 }
 
 private void dimmerEvents(hubitat.zwave.Command cmd) {
-    def value = (cmd.value ? "on" : "off")
-    eventProcess(name: "switch", value: value, descriptionText: "$device.displayName was turned $value", type: state.isDigital?"digital":"physical")
+    String value = (cmd.value ? "on" : "off")
+    String description = "${device.displayName} was turned ${value}"
+    if (txtEnable) log.info description
+    eventProcess(name: "switch", value: value, descriptionText: description, type: state.isDigital?"digital":"physical")
     if (cmd.value) {
-        eventProcess(name: "level", value: cmd.value == 99 ? 100 : cmd.value , unit: "%", type: state.isDigital?"digital":"physical")
+        description = "${device.displayName} was set to ${cmd.value}"
+        if (txtEnable) log.info description
+        eventProcess(name: "level", value: cmd.value == 99 ? 100 : cmd.value , descriptionText: description, unit: "%", type: state.isDigital?"digital":"physical")
     }
     state.isDigital=false
 }
@@ -356,25 +361,51 @@ void zwaveEvent(hubitat.zwave.commands.associationv2.AssociationGroupingsReport 
 }
 
 void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification cmd) {
+    Map evt = [name: "pushed", type:"physical"]
     if (cmd.sceneNumber==1) {
         if (cmd.keyAttributes==0) {
-            sendEvent(name: "pushed", value: 1)
+            evt.value=1
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==3) {
-            sendEvent(name: "pushed", value: 3)
+            evt.value=3
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==4) {
-            sendEvent(name: "pushed", value: 5)
+            evt.value=5
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==5) {
-            sendEvent(name: "pushed", value: 7)
+            evt.value=7
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         }
     } else if (cmd.sceneNumber==2) {
         if (cmd.keyAttributes==0) {
-            sendEvent(name: "pushed", value: 2)
+            evt.value=2
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==3) {
-            sendEvent(name: "pushed", value: 4)
+            evt.value=4
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==4) {
-            sendEvent(name: "pushed", value: 6)
+            evt.value=6
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==5) {
-            sendEvent(name: "pushed", value: 8)
+            evt.value=8
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         }
     }
 }
+
