@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 /**
  * Advanced GoControl GC-TBZ48 Thermostat Driver
- * v1.1
+ * v1.2
  * updated 2020-05-01
  */
 
@@ -56,7 +56,7 @@ metadata {
 @Field static List<String> supportedThermostatModes=["auto", "off", "heat", "emergency heat", "cool"]
 @Field static Map configParams = [
         1: [input: [name: "configParam1", type: "enum", title: "System Type", description: "", defaultValue: 0, options: [0:"Standard",1:"Heat Pump"]], parameterSize: 1],
-        2: [input: [name: "configParam2", type: "enum", title: "Fan Type", description:"", defaultValue: 0, options: [0:"Gas (No fan w/Heat", 1:"Electric (Fan w/Heat)"]], parameterSize: 1],
+        2: [input: [name: "configParam2", type: "enum", title: "Fan Type", description:"", defaultValue: 0, options: [0:"Gas (No fan w/Heat)", 1:"Electric (Fan w/Heat)"]], parameterSize: 1],
         3: [input: [name: "configParam3", type: "enum", title: "Change Over Type", description:"", defaultValue: 0, options: [0:"CO w/cool", 1:"CO w/heat"]], parameterSize: 1],
         4: [input: [name: "configParam4", type: "enum", title: "2nd Stage Heat Enable", defaultValue: 0, options: [0:"Disabled", 1:"Enabled"]], parameterSize: 1],
         5: [input: [name: "configParam5", type: "enum", title: "Aux Heat Enable", defaultValue: 0, options: [0:"Disabled", 1:"Enabled"]], parameterSize:1],
@@ -86,7 +86,7 @@ metadata {
         42: [input: [name: "configParam42", type: "number", title:"Un-Occupied CSP", description: "degrees", defaultValue: 112, range: "33..112"], parameterSize: 1],
         43: [input: [name: "configParam43", type: "number", title:"Remote Sensor 1 Node Number", description: "", defaultValue: 0, range: "0..252"], parameterSize: 1],
         48: [input: [name: "configParam48", type: "number", title:"Internal Sensor Temp Offset", description: "degrees", defaultValue: 0, range: "-7..7"], parameterSize: 1],
-        49: [input: [name: "configParam49", type: "number", title:"R1 Sensor Temp Offset", description: "degrees", defaultValue: 0, range: "-7..7"], parameterSize: 1],
+        49: [input: [name: "configParam49", type: "number", title:"Remote Sensor Temp Offset", description: "degrees", defaultValue: 0, range: "-7..7"], parameterSize: 1],
         53: [input: [name: "configParam53", type: "number", title:"Filter Timer Max (hrs)", description: "hours", defaultValue: 4000, range: "0..4000"], parameterSize: 2],
         61: [input: [name: "configParam61", type: "number", title:"Fan Purge Heat", description: "degrees", defaultValue: 90, range: "0..90"], parameterSize: 1],
         62: [input: [name: "configParam62", type: "number", title:"Fan Purge Cool", description: "degrees", defaultValue: 90, range: "0..90"], parameterSize: 1],
