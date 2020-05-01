@@ -1,6 +1,6 @@
 /*
 *	Zen26 Central Scene Switch
-*	version: 0.01B
+*	version: 0.02B
 */
 
 import groovy.transform.Field
@@ -151,7 +151,8 @@ void zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
 
 private void switchEvents(hubitat.zwave.Command cmd) {
     def value = (cmd.value ? "on" : "off")
-    eventProcess(name: "switch", value: value, descriptionText: "$device.displayName was turned $value")
+    eventProcess(name: "switch", value: value, descriptionText: "$device.displayName was turned $value", type: state.isDigital?"digital":"physical")
+    state.isDigital=false
 }
 
 void zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
@@ -160,10 +161,12 @@ void zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
 }
 
 void on() {
+    state.isDigital=true
     sendToDevice(zwave.basicV1.basicSet(value: 0xFF))
 }
 
 void off() {
+    state.isDigital=true
     sendToDevice(zwave.basicV1.basicSet(value: 0x00))
 }
 

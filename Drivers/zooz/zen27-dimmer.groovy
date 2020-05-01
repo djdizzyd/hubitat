@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 0.03B
+*	version: 0.04B
 */
 
 import groovy.transform.Field
@@ -29,7 +29,7 @@ metadata {
 }
 @Field static Map configParams = [
         1: [input: [name: "configParam1", type: "enum", title: "On/Off Paddle Orientation", description: "", defaultValue: 0, options: [0:"Normal",1:"Reverse",2:"Any paddle turns on/off"]], parameterSize: 1],
-        2: [input: [name: "configParam2", type: "enum", title: "LED Indicator Control", description: "", defaultValue: 0, options: [0:"Indicator is on when switch is off",1:"Indicator ois on when switch is on",2:"Indicator is always off",3:"Indicator is always on"]], parameterSize: 1],
+        2: [input: [name: "configParam2", type: "enum", title: "LED Indicator Control", description: "", defaultValue: 0, options: [0:"Indicator is on when switch is off",1:"Indicator is on when switch is on",2:"Indicator is always off",3:"Indicator is always on"]], parameterSize: 1],
         3: [input: [name: "configParam3", type: "enum", title: "Auto Turn-Off Timer", description: "", defaultValue: 0, options: [0:"Timer disabled",1:"Timer Enabled"]], parameterSize: 1],
         4: [input: [name: "configParam4", type: "number", title: "Auto Off Timer", description: "Minutes 1-65535", defaultValue: 60, ranges:"1..65535"], parameterSize:4],
         5: [input: [name: "configParam5", type: "enum", title: "Auto Turn-On Timer", description: "", defaultValue: 0, options: [0:"timer disabled",1:"timer enabled"]],parameterSize:1],
@@ -178,26 +178,31 @@ void zwaveEvent(hubitat.zwave.commands.switchmultilevelv2.SwitchMultilevelReport
 
 private void dimmerEvents(hubitat.zwave.Command cmd) {
     def value = (cmd.value ? "on" : "off")
-    eventProcess(name: "switch", value: value, descriptionText: "$device.displayName was turned $value")
+    eventProcess(name: "switch", value: value, descriptionText: "$device.displayName was turned $value", type: state.isDigital?"digital":"physical")
     if (cmd.value) {
-        eventProcess(name: "level", value: cmd.value == 99 ? 100 : cmd.value , unit: "%")
+        eventProcess(name: "level", value: cmd.value == 99 ? 100 : cmd.value , unit: "%", type: state.isDigital?"digital":"physical")
     }
+    state.isDigital=false
 }
 
 void on() {
+    state.isDigital=true
     sendToDevice(zwave.basicV1.basicSet(value: 0xFF))
 }
 
 void off() {
+    state.isDigital=true
     sendToDevice(zwave.basicV1.basicSet(value: 0x00))
 }
 
 void setLevel(level) {
+    state.isDigital=true
     int duration=1
     setLevel(level, duration)
 }
 
 void setLevel(level, duration) {
+    state.isDigital=true
     if (logEnable) log.debug "setLevel($level, $duration)"
     if(level > 99) level = 99
     sendToDevice(zwave.switchMultilevelV2.switchMultilevelSet(value: level, dimmingDuration: duration))
