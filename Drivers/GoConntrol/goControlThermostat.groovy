@@ -2,6 +2,8 @@ import groovy.transform.Field
 
 /**
  * Advanced GoControl GC-TBZ48 Thermostat Driver
+ * v1.1
+ * updated 2020-05-01
  */
 
 metadata {
