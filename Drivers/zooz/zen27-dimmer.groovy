@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 0.05B
+*	version: 0.06B
 */
 
 import groovy.transform.Field
@@ -160,11 +160,11 @@ void eventProcess(Map evt) {
 void startLevelChange(direction) {
     boolean upDownVal = direction == "down" ? true : false
     if (logEnable) log.debug "got startLevelChange(${direction})"
-    sendToDevice(zwave.switchMultilevelV2.switchMultilevelStartLevelChange(ignoreStartLevel: true, startLevel: device.currentValue("level"), upDown: upDownVal))
+    sendToDevice(zwave.switchMultilevelV3.switchMultilevelStartLevelChange(ignoreStartLevel: true, startLevel: device.currentValue("level"), upDown: upDownVal, incDec: 1, stepSize: 1, dimmingDuration: 20))
 }
 
 void stopLevelChange() {
-    sendToDevice(zwave.switchMultilevelV2.switchMultilevelStopLevelChange())
+    sendToDevice(zwave.switchMultilevelV3.switchMultilevelStopLevelChange())
 }
 
 void zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
