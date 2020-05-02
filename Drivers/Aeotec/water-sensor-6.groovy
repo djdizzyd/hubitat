@@ -1,6 +1,6 @@
 /*
 *	Aeotec Water Sensor 6
-*	version: 1.0
+*	version: 1.1
 */
 
 import groovy.transform.Field
@@ -164,7 +164,7 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
                     state.sleepy=true
                     break
                 case 1:
-                    state.sleppy=true
+                    state.sleepy=true
                     break
                 case 2:
                     state.sleepy=false
