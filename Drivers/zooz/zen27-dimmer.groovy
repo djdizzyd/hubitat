@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 0.06B
+*	version: 1.0
 */
 
 import groovy.transform.Field
@@ -53,6 +53,7 @@ metadata {
 ]
 @Field static Map CMD_CLASS_VERS=[0x20:1,0x5B:3,0x86:3,0x72:2,0x8E:3,0x85:2,0x59:1,0x26:2,0x70:1]
 @Field static int numberOfAssocGroups=3
+
 void logsOff(){
     log.warn "debug logging disabled..."
     device.updateSetting("logEnable",[value:"false",type:"bool"])

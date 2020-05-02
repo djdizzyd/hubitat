@@ -1,6 +1,6 @@
 /*
 *	Zen26 Central Scene Switch
-*	version: 0.03B
+*	version: 1.0
 */
 
 import groovy.transform.Field
