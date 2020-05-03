@@ -6,7 +6,7 @@
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Aeotec Water Sensor 6", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "") {
+    definition (name: "Aeotec Water Sensor 6", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Aeotec/water-sensor-6.groovy") {
         capability "Refresh"
         capability "Actuator"
         capability "Sensor"

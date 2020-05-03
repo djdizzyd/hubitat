@@ -1,12 +1,12 @@
 /*
 *	HomeSeer HS-FLS100+ Floodlight Sensor
-*	version: 1.0
+*	version: 1.1
 */
 
 import groovy.transform.Field
 
 metadata {
-    definition (name: "HomeSeer HS-FLS100+ Floodlight Sensor", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "") {
+    definition (name: "HomeSeer HS-FLS100+ Floodlight Sensor", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/HomeSeer/HS-FLS100-Floodlight-Sensor.groovy") {
         capability "Switch"
         capability "Refresh"
         capability "Actuator"

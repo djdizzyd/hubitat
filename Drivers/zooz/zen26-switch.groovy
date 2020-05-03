@@ -1,12 +1,12 @@
 /*
 *	Zen26 Central Scene Switch
-*	version: 1.0
+*	version: 1.1
 */
 
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Zooz Zen26 Central Scene Switch", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "") {
+    definition (name: "Zooz Zen26 Central Scene Switch", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/zooz/zen26-switch.groovy") {
         capability "Switch"
         capability "Refresh"
         capability "Actuator"

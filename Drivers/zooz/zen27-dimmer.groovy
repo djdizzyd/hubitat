@@ -1,12 +1,12 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 1.0
+*	version: 1.1
 */
 
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Zooz Zen27 Central Scene Dimmer", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "") {
+    definition (name: "Zooz Zen27 Central Scene Dimmer", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/zooz/zen27-dimmer.groovy") {
         capability "SwitchLevel"
         capability "Switch"
         capability "Refresh"
