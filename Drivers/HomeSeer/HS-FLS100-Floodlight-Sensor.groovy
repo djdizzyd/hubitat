@@ -1,6 +1,6 @@
 /*
 *	HomeSeer HS-FLS100+ Floodlight Sensor
-*	version: 1.1
+*	version: 1.2
 */
 
 import groovy.transform.Field
@@ -20,6 +20,7 @@ metadata {
     preferences {
         configParams.each { input it.value.input }
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
+        input name: "txtEnable", type: "bool", title: "TXT Descriptive logging", defaultValue: false
     }
 }
 @Field static Map configParams = [
@@ -133,7 +134,7 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
             evt.value = cmd.scaledSensorValue.toInteger()
             evt.unit = "lux"
             evt.isStateChange=true
-            evt.description="${device.displayName}: Illuminance report received: ${evt.value}"
+            evt.descriptionText="${device.displayName}: Illuminance report received: ${evt.value}"
             break
     }
     if (evt.isStateChange) {
