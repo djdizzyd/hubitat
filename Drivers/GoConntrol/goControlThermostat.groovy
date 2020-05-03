@@ -2,8 +2,8 @@ import groovy.transform.Field
 
 /**
  * Advanced GoControl GC-TBZ48 Thermostat Driver
- * v1.4
- * updated 2020-05-01
+ * v1.5
+ * updated 2020-05-03
  */
 
 metadata {
@@ -452,25 +452,26 @@ void setpointCalc(String newmode, String unit, value) {
         mode=state.lastMode
     }
     if (newmode==mode) {
-        eventProcess(name: "thermostatSetpoint", value: value, unit: unit)
+        eventProcess(name: "thermostatSetpoint", value: value, unit: unit, type: state.isDigital?"digital":"physical")
     }
 }
 
 void zwaveEvent(hubitat.zwave.commands.thermostatsetpointv2.ThermostatSetpointReport cmd) {
     if (logEnable) log.debug "Got thermostat setpoint report: ${cmd}"
     if (device.currentValue("thermostatMode")=="heat") mode="heat"
-    if (device.currentValue(""))
-        String unit=cmd.scale == 1 ? "F" : "C"
+    if (device.currentValue("thermostatMode")=="cool") mode="cool"
+    String unit=cmd.scale == 1 ? "F" : "C"
     switch (cmd.setpointType) {
         case 1:
-            eventProcess(name: "heatingSetpoint", value: cmd.scaledValue, unit: unit)
+            eventProcess(name: "heatingSetpoint", value: cmd.scaledValue, unit: unit, type: state.isDigital?"digital":"physical")
             setpointCalc("heat", unit, cmd.scaledValue)
             break
         case 2:
-            eventProcess(name: "coolingSetpoint", value: cmd.scaledValue, unit: unit)
+            eventProcess(name: "coolingSetpoint", value: cmd.scaledValue, unit: unit, type: state.isDigital?"digital":"physical")
             setpointCalc("cool", unit, cmd.scaledValue)
             break
     }
+    state.isDigital=false
 }
 
 void zwaveEvent(hubitat.zwave.commands.thermostatoperatingstatev1.ThermostatOperatingStateReport cmd) {
@@ -502,14 +503,16 @@ void zwaveEvent(hubitat.zwave.commands.thermostatfanmodev1.ThermostatFanModeRepo
     if (logEnable) log.debug "Got thermostat fan mode report: ${cmd}"
     String newmode=THERMOSTAT_FAN_MODE[cmd.fanMode.toInteger()]
     if (logEnable) log.debug "Translated fan mode: " + newmode
-    eventProcess(name: "thermostatFanMode", value: newmode)
+    eventProcess(name: "thermostatFanMode", value: newmode, type: state.isDigital?"digital":"physical")
+    state.isDigital=false
 }
 
 void zwaveEvent(hubitat.zwave.commands.thermostatmodev1.ThermostatModeReport cmd) {
     if (logEnable) log.debug "Got thermostat mode report: ${cmd}"
     String newmode=THERMOSTAT_MODE[cmd.mode.toInteger()]
     if (logEnable) log.debug "Translated thermostat mode: " + newmode
-    eventProcess(name: "thermostatMode", value: newmode)
+    eventProcess(name: "thermostatMode", value: newmode, type: state.isDigital?"digital":"physical")
+    state.isDigital=false
 }
 
 void zwaveEvent(hubitat.zwave.commands.basicv1.BasicSet cmd) {
@@ -525,16 +528,19 @@ private void setSetpoint(setPointType, value) {
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.thermostatSetpointV2.thermostatSetpointSet(setpointType: setPointType, scale: getTemperatureScale()=="F" ? 1:0 , precision: 0, scaledValue: value))
     cmds.add(zwave.thermostatSetpointV2.thermostatSetpointGet(setpointType: setPointType))
+    state.isDigital=true
     sendToDevice(cmds)
 }
 
 void setHeatingSetpoint(degrees) {
     if (logEnable) log.debug "setHeatingSetpoint(${degrees}) called"
+    state.isDigital=true
     setSetpoint(1,degrees)
 }
 
 void setCoolingSetpoint(degrees) {
     if (logEnable) log.debug "setCoolingSetpoint(${degrees}) called"
+    state.isDigital=true
     setSetpoint(2,degrees)
 }
 
@@ -544,10 +550,12 @@ void setThermostatMode(mode) {
     if (logEnable) log.debug "setting zwave thermostat mode ${SET_THERMOSTAT_MODE[mode]}"
     cmds.add(zwave.thermostatModeV1.thermostatModeSet(mode: SET_THERMOSTAT_MODE[mode]))
     cmds.add(zwave.thermostatModeV1.thermostatModeGet())
+    state.isDigital=true
     sendToDevice(cmds)
 }
 
 void off() {
+    state.isDigital=true
     setThermostatMode("off")
 }
 
@@ -556,18 +564,22 @@ void on() {
 }
 
 void heat() {
+    state.isDigital=true
     setThermostatMode("heat")
 }
 
 void emergencyHeat() {
+    state.isDigital=true
     setThermostatMode("emergency heat")
 }
 
 void cool() {
+    state.isDigital=true
     setThermostatMode("cool")
 }
 
 void auto() {
+    state.isDigital=true
     setThermostatMode("auto")
 }
 
@@ -577,14 +589,17 @@ void setThermostatFanMode(mode) {
     if (logEnable) log.debug "setting zwave thermostat fan mode ${SET_THERMOSTAT_FAN_MODE[mode]}"
     cmds.add(zwave.thermostatFanModeV1.thermostatFanModeSet(fanMode: SET_THERMOSTAT_FAN_MODE[mode]))
     cmds.add(zwave.thermostatFanModeV1.thermostatFanModeGet())
+    state.isDigital=true
     sendToDevice(cmds)
 }
 
 void fanOn() {
+    state.isDigital=true
     setThermostatFanMode("on")
 }
 
 void fanAuto() {
+    state.isDigital=true
     setThermostatFanMode("auto")
 }
 
