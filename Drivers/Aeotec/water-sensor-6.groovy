@@ -1,6 +1,6 @@
 /*
 *	Aeotec Water Sensor 6
-*	version: 1.1
+*	version: 1.2
 */
 
 import groovy.transform.Field
@@ -249,7 +249,7 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
             evt.value = cmd.scaledSensorValue.toInteger()
             evt.unit = cmd.scale==0?"C":"F"
             evt.isStateChange=true
-            evt.description="${device.displayName}: Illuminance report received: ${evt.value}"
+            evt.descriptionText="${device.displayName}: Illuminance report received: ${evt.value}"
             break
     }
     if (evt.isStateChange) {
