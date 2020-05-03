@@ -25,6 +25,14 @@ Some of my other releases / projects:
 
 [[RELEASE] Everspring ST815 Illumination Sensor](https://community.hubitat.com/t/release-everspring-st815-illumination-sensor/38799?u=bcopeland)
 
+[[RELEASE] Advanced Zooz Central Scene ZEN27/ZEN26 Dimmer/Switch Drivers](https://community.hubitat.com/t/release-advanced-zooz-zen27-zen26-central-scene-dimmer-and-switch-drivers/38990?u=bcopeland)
+
+[[RELEASE] Aeotec Water Sensor 6](https://community.hubitat.com/t/release-aeotec-water-sensor-6/39292?u=bcopeland)
+
+[[RELEASE] HS-FLS100+ Floodlight Sensor](https://community.hubitat.com/t/release-hs-fls100-floodlight-sensor/39283?u=bcopeland)
+
+[[RELEASE] Improved Inovelli 4-in-1 Sensor](https://community.hubitat.com/t/release-improved-lzw-60-inovelli-4-in-1-sensor-driver/37744?u=bcopeland)
+
 As well as contributions I have made to other community projects.
 
 # Other notable hubitat community development projects
