@@ -1,6 +1,6 @@
 /*
 *	Zen26 Central Scene Switch
-*	version: 1.1
+*	version: 1.2
 */
 
 import groovy.transform.Field
@@ -321,7 +321,7 @@ void zwaveEvent(hubitat.zwave.commands.associationv2.AssociationGroupingsReport 
 }
 
 void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification cmd) {
-    Map evt = [name: "pushed", type:"physical"]
+    Map evt = [name: "pushed", type:"physical", isStateChange:true]
     if (cmd.sceneNumber==1) {
         if (cmd.keyAttributes==0) {
             evt.value=1

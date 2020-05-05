@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 1.1
+*	version: 1.2
 */
 
 import groovy.transform.Field
@@ -53,7 +53,6 @@ metadata {
 ]
 @Field static Map CMD_CLASS_VERS=[0x20:1,0x5B:3,0x86:3,0x72:2,0x8E:3,0x85:2,0x59:1,0x26:2,0x70:1]
 @Field static int numberOfAssocGroups=3
-
 void logsOff(){
     log.warn "debug logging disabled..."
     device.updateSetting("logEnable",[value:"false",type:"bool"])
@@ -201,17 +200,11 @@ void off() {
     sendToDevice(zwave.basicV1.basicSet(value: 0x00))
 }
 
-void setLevel(level) {
-    state.isDigital=true
-    int duration=1
-    setLevel(level, duration)
-}
-
-void setLevel(level, duration) {
+void setLevel(level, duration=1) {
     state.isDigital=true
     if (logEnable) log.debug "setLevel($level, $duration)"
     if(level > 99) level = 99
-    sendToDevice(zwave.switchMultilevelV2.switchMultilevelSet(value: level, dimmingDuration: duration))
+    sendToDevice(zwave.switchMultilevelV2.switchMultilevelSet(value: level.toInteger(), dimmingDuration: duration))
 }
 
 void zwaveEvent(hubitat.zwave.commands.securityv1.SecurityMessageEncapsulation cmd) {
@@ -362,7 +355,7 @@ void zwaveEvent(hubitat.zwave.commands.associationv2.AssociationGroupingsReport 
 }
 
 void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification cmd) {
-    Map evt = [name: "pushed", type:"physical"]
+    Map evt = [name: "pushed", type:"physical", isStateChange:true]
     if (cmd.sceneNumber==1) {
         if (cmd.keyAttributes==0) {
             evt.value=1
