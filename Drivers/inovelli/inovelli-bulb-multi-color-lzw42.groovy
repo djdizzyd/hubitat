@@ -1,40 +1,6 @@
 /**
- *  Copyright 2020 Bryan Copeland
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License. You may obtain a copy of the License at:
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
- *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
- *  for the specific language governing permissions and limitations under the License.
- *
  *  Inovelli Bulb Multi-Color LZW42
- *
- *  As of 4/9/2020 there is no inovelli code remaining in this driver
- *
- *	update by bcopeland 4/9/2020
- *      major re-write for new coding standards / cleanup
- *      stabilization of color temp and color reporting
- *      re-organization of device data for standardization / addition of serialnumber, hardware ver, protocol ver, firmware
- *      re-work of associations
- *	updated by npk22 4/9/2020
- *		added dimming speed parameter
- *		added dimming speed to on / off
- *	updated by bcopeland 4/11/2020
- *  	fixed type definitions
- *  	fixed fingerprint
- *  updated by bcopeland 4/12/2020
- *  	added duplicate event filtering (optional as it has a slight possibility of causing issues with voice assistants)
- *  	changed dimming speed default to 1 to match previous default functionality
- *  updated by bcopeland 4/15/2020
- *  	fixed bug in CT report
- *    	added gamma correction as an optional setting
- *  updated by bcopeland 4/16/2020
- *      updated ambiguous language
- *  updated by bcopeland 4/16/2020
- *  	updated namespace and importUrl as I will no longer be maintaining code on inovelli official repo
+ *  v2.1
  */
 
 import groovy.transform.Field
@@ -65,6 +31,7 @@ metadata {
         input name: "eventFilter", type: "bool", title: "Filter out duplicate events", defaultValue: false
         input name: "enableGammaCorrect", type: "bool", description: "May cause a slight difference in reported color", title: "Enable gamma correction on setColor", defaultValue: false
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
+        input name: "txtEnable", type: "bool", title: "Enable descriptive logging", defaultValue: false
     }
 }
 @Field static Map configParams = [
@@ -178,6 +145,7 @@ private List<hubitat.zwave.Command> queryAllColors() {
 
 void eventProcess(Map evt) {
     if (device.currentValue(evt.name).toString() != evt.value.toString() || !eventFilter) {
+        if (txtEnable && evt.descriptionText) log.info evt.descriptionText
         evt.isStateChange=true
         sendEvent(evt)
     }
@@ -215,25 +183,25 @@ void zwaveEvent(hubitat.zwave.commands.switchcolorv2.SwitchColorReport cmd) {
         eventProcess(name: "color", value: hexColor)
         // Send the color as hue and saturation
         List hsv = hubitat.helper.ColorUtils.rgbToHSV(colors)
-        eventProcess(name: "hue", value: hsv[0].round())
-        eventProcess(name: "saturation", value: hsv[1].round())
+        eventProcess(name: "hue", value: hsv[0].round(), descriptionText: "${device.displayName} hue is ${hsv[0].round()}")
+        eventProcess(name: "saturation", value: hsv[1].round(), descriptionText: "${device.displayName} saturation is ${hsv[1].round()}")
 
         if ((hsv[0] > 0) && (hsv[1] > 0)) {
             setGenericName(hsv[0])
-            eventProcess(name: "level", value: hsv[2].round())
+            eventProcess(name: "level", value: hsv[2].round(), descriptionText: "${device.displayName} level is ${hsv[2].round()}")
         }
     } else if (WHITE_NAMES.every { state.colorReceived[it] != null} && device.currentValue("colorMode")=="CT") {
         int warmWhite = state.colorReceived[WARM_WHITE]
         int coldWhite = state.colorReceived[COLD_WHITE]
         if (logEnable) log.debug "warmWhite: $warmWhite, coldWhite: $coldWhite"
         if (warmWhite == 0 && coldWhite == 0) {
-            eventProcess(name: "colorTemperature", value: COLOR_TEMP_MIN)
+            eventProcess(name: "colorTemperature", value: COLOR_TEMP_MIN, descriptionText: "${device.displayName} color temperature is ${COLOR_TEMP_MIN}")
         } else {
             int colorTemp = COLOR_TEMP_MIN + (COLOR_TEMP_DIFF / 2)
             if (warmWhite != coldWhite) {
                 colorTemp = (COLOR_TEMP_MAX - (COLOR_TEMP_DIFF * warmWhite) / 255) as Integer
             }
-            eventProcess(name: "colorTemperature", value: colorTemp)
+            eventProcess(name: "colorTemperature", value: colorTemp, descriptionText: "${device.displayName} color temperature is ${colorTemp}")
             setGenericTempName(colorTemp)
         }
     }
@@ -241,9 +209,9 @@ void zwaveEvent(hubitat.zwave.commands.switchcolorv2.SwitchColorReport cmd) {
 
 private void dimmerEvents(hubitat.zwave.Command cmd) {
     def value = (cmd.value ? "on" : "off")
-    eventProcess(name: "switch", value: value, descriptionText: "$device.displayName was turned $value")
+    eventProcess(name: "switch", value: value, descriptionText: "${device.displayName} was turned ${value}")
     if (cmd.value) {
-        eventProcess(name: "level", value: cmd.value == 99 ? 100 : cmd.value , unit: "%")
+        eventProcess(name: "level", value: cmd.value == 99 ? 100 : cmd.value , unit: "%", descriptionText: "${device.displayName} was set to ${cmd.value}%")
     }
 }
 
