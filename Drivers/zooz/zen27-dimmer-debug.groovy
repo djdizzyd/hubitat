@@ -202,19 +202,12 @@ void off() {
     sendToDevice(zwave.basicV1.basicSet(value: 0x00))
 }
 
-void setLevel(level) {
-    log.debug "setLevel(${level})"
-    state.isDigital=true
-    int duration=1
-    setLevel(level, duration)
-}
-
-void setLevel(level, duration) {
+void setLevel(level, duration=1) {
     log.debug "setLevel(${level}, ${duration})"
     state.isDigital=true
     if (logEnable) log.debug "setLevel($level, $duration)"
     if(level > 99) level = 99
-    hubitat.zwave.Command cmd = zwave.switchMultilevelV2.switchMultilevelSet(value: level, dimmingDuration: duration)
+    hubitat.zwave.Command cmd = zwave.switchMultilevelV2.switchMultilevelSet(value: level.toInteger(), dimmingDuration: duration)
     log.debug "selLevel cmd: ${cmd}"
     sendToDevice(cmd)
 
