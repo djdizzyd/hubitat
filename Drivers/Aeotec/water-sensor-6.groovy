@@ -1,6 +1,6 @@
 /*
 *	Aeotec Water Sensor 6
-*	version: 1.3
+*	version: 1.4
 */
 
 import groovy.transform.Field
@@ -115,7 +115,7 @@ void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
         cmds.addAll(runConfigs())
         state.configUpdated=false
     }
-    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(scale: 1, sensorType: 1))
+    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(scale: (location.temperatureScale=="F"?1:0), sensorType: 1))
     cmds.add(zwave.notificationV7.notificationGet(notificationType: 5, event:0))
     cmds.add(zwave.configurationV1.configurationGet(parameterNumber: 136))
     cmds.add(zwave.wakeUpV1.wakeUpNoMoreInformation())
@@ -209,7 +209,7 @@ void pollDeviceData() {
     cmds.add(zwave.manufacturerSpecificV2.deviceSpecificGet(deviceIdType: 1))
     cmds.addAll(processAssociations())
     cmds.addAll(pollConfigs())
-    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(scale: 1, sensorType: 1))
+    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(scale: (location.temperatureScale=="F"?1:0), sensorType: 1))
     cmds.add(zwave.notificationV7.notificationGet(notificationType: 5, event:0))
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 94, configurationValue:[1], size:1))
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 101, configurationValue:[3], size:1))
@@ -222,7 +222,7 @@ void pollDeviceData() {
 
 void refresh() {
     List<hubitat.zwave.Command> cmds=[]
-    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(scale: 1, sensorType: 1))
+    cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(scale: (location.temperatureScale=="F"?1:0), sensorType: 1))
     cmds.add(zwave.notificationV7.notificationGet(notificationType: 5, event:0))
     cmds.add(zwave.configurationV1.configurationGet(parameterNumber: 136))
     sendToDevice(cmds)
