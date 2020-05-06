@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 1.2
+*	version: 1.3
 */
 
 import groovy.transform.Field
@@ -32,24 +32,24 @@ metadata {
         1: [input: [name: "configParam1", type: "enum", title: "On/Off Paddle Orientation", description: "", defaultValue: 0, options: [0:"Normal",1:"Reverse",2:"Any paddle turns on/off"]], parameterSize: 1],
         2: [input: [name: "configParam2", type: "enum", title: "LED Indicator Control", description: "", defaultValue: 0, options: [0:"Indicator is on when switch is off",1:"Indicator is on when switch is on",2:"Indicator is always off",3:"Indicator is always on"]], parameterSize: 1],
         3: [input: [name: "configParam3", type: "enum", title: "Auto Turn-Off Timer", description: "", defaultValue: 0, options: [0:"Timer disabled",1:"Timer Enabled"]], parameterSize: 1],
-        4: [input: [name: "configParam4", type: "number", title: "Auto Off Timer", description: "Minutes 1-65535", defaultValue: 60, ranges:"1..65535"], parameterSize:4],
+        4: [input: [name: "configParam4", type: "number", title: "Auto Off Timer", description: "Minutes 1-65535", defaultValue: 60, range:"1..65535"], parameterSize:4],
         5: [input: [name: "configParam5", type: "enum", title: "Auto Turn-On Timer", description: "", defaultValue: 0, options: [0:"timer disabled",1:"timer enabled"]],parameterSize:1],
-        6: [input: [name: "configParam6", type: "number", title: "Auto On Timer", description: "Minutes 1-65535", defaultValue: 60, ranges:"1..65535"], parameterSize: 4],
+        6: [input: [name: "configParam6", type: "number", title: "Auto On Timer", description: "Minutes 1-65535", defaultValue: 60, range:"1..65535"], parameterSize: 4],
         7: [input: [name: "configParam7", type: "enum", title: "Association Reports", description: "", defaultValue: 15, options:[0:"none",1:"physical tap on ZEN27 only",2:"physical tap on 3-way switch only",3:"physical tap on ZEN27 or 3-way switch",4:"Z-Wave command from hub",5:"physical tap on ZEN27 or Z-Wave command",6:"physical tap on connected 3-way switch or Z-wave command",7:"physical tap on ZEN27 / 3-way switch / or Z-wave command",8:"timer only",9:"physical tap on ZEN27 or timer",10:"physical tap on 3-way switch or timer",11:"physical tap on ZEN 27 / 3-way switch or timer",12:"Z-wave command from hub or timer",13:"physical tap on ZEN27, Z-wave command, or timer",14:"physical tap on ZEN27 / 3-way switch / Z-wave command, or timer", 15:"all of the above"]],parameterSize:1],
         8: [input: [name: "configParam8", type: "enum", title: "On/Off Status After Power Failure", description: "", defaultValue: 2, options:[0:"Off",1:"On",2:"Last State"]],parameterSize:1],
-        9: [input: [name: "configParam9", type: "number", title: "Ramp Rate Control", description: "Seconds: 0-99", defaultValue: 1, ranges:"0..99"], parameterSize:1],
+        9: [input: [name: "configParam9", type: "number", title: "Ramp Rate Control", description: "Seconds: 0-99", defaultValue: 1, range:"0..99"], parameterSize:1],
         17: [input: [name: "configParam17", type: "enum", title: "Z-Wave Ramp Control", description: "", defaultValue: 1, options: [0:"Z-Wave ramp rate matches physical",1:"Z-Wave ramp rate is set independently"]],parameterSize:1],
-        10: [input: [name: "configParam10", type: "number", title: "Minimum Level", description: "1-99%", defaultValue: 1, ranges:"1..99"], parameterSize:1],
-        11: [input: [name: "configParam11", type: "number", title: "Maximum level", description: "1-99%", defaultValue: 99, ranges:"1..99"], parameterSize:1],
+        10: [input: [name: "configParam10", type: "number", title: "Minimum Level", description: "1-99%", defaultValue: 1, range:"1..99"], parameterSize:1],
+        11: [input: [name: "configParam11", type: "number", title: "Maximum level", description: "1-99%", defaultValue: 99, range:"1..99"], parameterSize:1],
         12: [input: [name: "configParam12", type: "enum", title: "Double Tap Function", description: "", defaultValue: 0, options:[0:"Turn on full brightness",1:"Turn on to maximum level"]], parameterSize:1],
         14: [input: [name: "configParam14", type: "enum", title: "Double/Single Tap Function", description:"", defaultValue: 0, options:[0:"double tap to full / maximum brightness level enabled",1:"double tap to full / maximum brightness level disabled, single tap turns light on to last brightness level",2:" double tap to full / maximum brightness level disabled, single tap turns light on to full / maximum brightness level"]],parameterSize:1],
         13: [input: [name: "configParam13", type: "enum", title: "Enable/Disable Scene Control", defaultValue: 0, options:[0:"Scene control disabled",1:"scene control enabled"]],parameterSize:1],
         15: [input: [name: "configParam15", type: "enum", title: "Smart Bulb Mode", defaultValue: 1, options:[0:"physical paddle control disabled",1:"physical paddle control enabled",2:"physical paddle and z-wave control disabled"]],parameterSize: 1],
         20: [input: [name: "configParam20", type: "enum", title: "Report Type", defaultValue:0, options: [0:"report each brightness level to hub when physical / Z-Wave control is disabled for physical dimming (final level only reported if physical / Z-Wave control is enabled)",1:"report final brightness level only for physical dimming, regardless of the physical / Z-Wave control mode"]], parameterSize:1],
         21: [input: [name: "configParam21", type: "enum", title: "Report Type Disabled Physical", defaultValue:0, options: [0:"switch reports on/off status and changes LED indicator state even if physical and Z-Wave control is disabled", 1:"switch doesn't report on/off status or change LED indicator state when physical (and Z-Wave) control is disabled"]], parameterSize:1],
-        15: [input: [name: "configParam15", type: "number", title: "Physical Dimming Speed", description: "Seconds 1-99", defaultValue: 4, ranges:"1..99"], parameterSize: 1],
-        18: [input: [name: "configParam18", type: "number", title: "Custom Brightness Level On", description: "0 – last brightness level (default); 1 – 99 (%) for custom brightness level", defaultValue: 0, ranges: "0..99"], parameterSize:1],
-        22: [input: [name: "configParam22", type: "number", title: "Night Light Mode", description: "0 – feature disabled; 1 – 99 (%). Default: 20", defaultValue: 20, ranges: "0..99"], parameterSize:1]
+        15: [input: [name: "configParam15", type: "number", title: "Physical Dimming Speed", description: "Seconds 1-99", defaultValue: 4, range:"1..99"], parameterSize: 1],
+        18: [input: [name: "configParam18", type: "number", title: "Custom Brightness Level On", description: "0 – last brightness level (default); 1 – 99 (%) for custom brightness level", defaultValue: 0, range: "0..99"], parameterSize:1],
+        22: [input: [name: "configParam22", type: "number", title: "Night Light Mode", description: "0 – feature disabled; 1 – 99 (%). Default: 20", defaultValue: 20, range: "0..99"], parameterSize:1]
 ]
 @Field static Map CMD_CLASS_VERS=[0x20:1,0x5B:3,0x86:3,0x72:2,0x8E:3,0x85:2,0x59:1,0x26:2,0x70:1]
 @Field static int numberOfAssocGroups=3

@@ -1,6 +1,6 @@
 /*
 *	HomeSeer HS-FLS100+ Floodlight Sensor
-*	version: 1.2
+*	version: 1.3
 */
 
 import groovy.transform.Field
@@ -24,9 +24,9 @@ metadata {
     }
 }
 @Field static Map configParams = [
-        1: [input: [name: "configParam1", type: "number", title: "PIR Trigger Off period", description: "seconds 8-720", defaultValue: 15, ranges:"8..720"], parameterSize: 2],
+        1: [input: [name: "configParam1", type: "number", title: "PIR Trigger Off period", description: "seconds 8-720", defaultValue: 15, range:"8..720"], parameterSize: 2],
         2: [input: [name: "configParam2", type: "enum", title: "Lux Threshold Settings", description: "", defaultValue: 50, options:[0:"Always don't turn on light",255:"Turn Light on by PIR",30:"Turn light on @ 30 Lux",40:"Turn light on @ 40 lux",50:"Turn light on @ 50 lux", 60:"Turn light on @ 60 lux",70:"Turn light on @ 70 lux",80:"Turn light on @ 80 lux", 90:"Turn light on @ 90 lux", 100:"Turn light on @ 100 lux", 110:"Turn light on @ 110 lux", 120:"Turn light on @ 120 lux", 130:"Turn light on @ 130 lux", 140:"Turn light on @ 140 lux", 150:"Turn light on @ 150 lux", 160:"Turn light on @ 160 lux", 170:"Turn light on @ 170 lux", 180:"Turn light on @ 180 lux", 190:"Turn light on @ 190 lux", 200:"Turn light on @ 200 lux"]], parameterSize: 2],
-        3: [input: [name: "configParam3", type: "number", title: "Lux level report", description: "minutes 0 to 1440 minutes", defaultValue: 10, ranges:"0..1440"], parameterSize: 2]
+        3: [input: [name: "configParam3", type: "number", title: "Lux level report", description: "minutes 0 to 1440 minutes", defaultValue: 10, range:"0..1440"], parameterSize: 2]
 ]
 @Field static Map ZWAVE_NOTIFICATION_TYPES=[0:"Reserverd", 1:"Smoke", 2:"CO", 3:"CO2", 4:"Heat", 5:"Water", 6:"Access Control", 7:"Home Security", 8:"Power Management", 9:"System", 10:"Emergency", 11:"Clock", 12:"First"]
 @Field static Map CMD_CLASS_VERS=[0x20:1,0x86:2,0x72:2,0x5B:3,0x70:1,0x85:2,0x59:1,0x31:5,0x71:4]
