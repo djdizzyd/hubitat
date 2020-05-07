@@ -1,6 +1,6 @@
 /*
 *	Zen27 Central Scene Dimmer
-*	version: 1.3
+*	version: 1.4
 */
 
 import groovy.transform.Field
@@ -47,7 +47,7 @@ metadata {
         15: [input: [name: "configParam15", type: "enum", title: "Smart Bulb Mode", defaultValue: 1, options:[0:"physical paddle control disabled",1:"physical paddle control enabled",2:"physical paddle and z-wave control disabled"]],parameterSize: 1],
         20: [input: [name: "configParam20", type: "enum", title: "Report Type", defaultValue:0, options: [0:"report each brightness level to hub when physical / Z-Wave control is disabled for physical dimming (final level only reported if physical / Z-Wave control is enabled)",1:"report final brightness level only for physical dimming, regardless of the physical / Z-Wave control mode"]], parameterSize:1],
         21: [input: [name: "configParam21", type: "enum", title: "Report Type Disabled Physical", defaultValue:0, options: [0:"switch reports on/off status and changes LED indicator state even if physical and Z-Wave control is disabled", 1:"switch doesn't report on/off status or change LED indicator state when physical (and Z-Wave) control is disabled"]], parameterSize:1],
-        15: [input: [name: "configParam15", type: "number", title: "Physical Dimming Speed", description: "Seconds 1-99", defaultValue: 4, range:"1..99"], parameterSize: 1],
+        16: [input: [name: "configParam16", type: "number", title: "Physical Dimming Speed", description: "Seconds 1-99", defaultValue: 4, range:"1..99"], parameterSize: 1],
         18: [input: [name: "configParam18", type: "number", title: "Custom Brightness Level On", description: "0 – last brightness level (default); 1 – 99 (%) for custom brightness level", defaultValue: 0, range: "0..99"], parameterSize:1],
         22: [input: [name: "configParam22", type: "number", title: "Night Light Mode", description: "0 – feature disabled; 1 – 99 (%). Default: 20", defaultValue: 20, range: "0..99"], parameterSize:1]
 ]
