@@ -1,3 +1,8 @@
+/*
+*	Ring Alarm Range Extender Gen 1 / Gen 2
+*	version: 2.0
+*/
+
 import groovy.transform.Field
 
 metadata {
