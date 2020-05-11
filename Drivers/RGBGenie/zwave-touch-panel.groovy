@@ -2,7 +2,7 @@
 *	Touch Panel Driver
 *	Code written for RGBGenie by Bryan Copeland
 *
-*   Updated 2020-02-26 Added importUrl
+*   v2.1 - 2020-05-11
 */
 
 
@@ -15,10 +15,10 @@ metadata {
         capability "Configuration"
         capability "Refresh"
 
-        fingerprint mfr:"0330", prod:"0301", deviceId:"A109", inClusters:"0x5E,0x85,0x59,0x8E,0x55,0x86,0x72,0x5A,0x73,0x98,0x9F,0x6C,0x5B,0x7A", outClusters:"0x26,0x2B,0x2C", deviceJoinName: "RGBGenie Dimmer Touch Panel"
-        fingerprint mfr:"0330", prod:"0301", deviceId:"A106", inClusters:"0x5E,0x85,0x59,0x8E,0x55,0x86,0x72,0x5A,0x73,0x98,0x9F,0x6C,0x5B,0x7A", outClusters:"0x26,0x33,0x2B,0x2C", deviceJoinName: "RGBGenie 3 Scene Color Touch Panel"
-        fingerprint mfr:"0330", prod:"0301", deviceId:"A105", inClusters:"0x5E,0x85,0x59,0x8E,0x55,0x86,0x72,0x5A,0x73,0x98,0x9F,0x6C,0x5B,0x7A", outClusters:"0x26,0x33,0x2B,0x2C", deviceJoinName: "RGBGenie 3 Zone Color Touch Panel"
-        fingerprint mfr:"0330", prod:"0301", deviceId:"A101", inClusters:"0x5E,0x85,0x59,0x8E,0x55,0x86,0x72,0x5A,0x73,0x98,0x9F,0x6C,0x5B,0x7A", outClusters:"0x26,0x33,0x2B,0x2C", deviceJoinName: "RGBGenie Color Temperature Touch Panel"
+        fingerprint mfr:"0330", prod:"0301", deviceId:"A109", deviceJoinName: "RGBGenie Dimmer Touch Panel"
+        fingerprint mfr:"0330", prod:"0301", deviceId:"A106", deviceJoinName: "RGBGenie 3 Scene Color Touch Panel"
+        fingerprint mfr:"0330", prod:"0301", deviceId:"A105", deviceJoinName: "RGBGenie 3 Zone Color Touch Panel"
+        fingerprint mfr:"0330", prod:"0301", deviceId:"A101", deviceJoinName: "RGBGenie Color Temperature Touch Panel"
 
     }
     preferences {
@@ -95,14 +95,23 @@ void updated() {
     for (int i = 1 ; i <= 3; i++) {
         if (settings."addHubZone$i") {
             if (getChildDevice("${device.deviceNetworkId}-$i")) {
+                // remove legacy naming
                 deleteChildDevice("${device.deviceNetworkId}-$i")
             }
-            if (!getChildDevice("${device.deviceNetworkId}-$i-2-L")) {
-                com.hubitat.app.ChildDeviceWrapper child=addChildDevice("hubitat", "Generic Component RGBW", "${device.deviceNetworkId}-$i-2-L", [completedSetup: true, label: "${device.displayName} (Zone$i) Light", isComponent: true, componentName: "zone$i", componentLabel: "Zone $i"])
+            if (getChildDevice("${device.deviceNetworkId}-$i-2-L")) {
+                // remove legacy naming
+                deleteChildDevice("${device.deviceNetworkId}-$i-2-L")
+            }
+            if (!getChildDevice("${device.id}-$i-2-L")) {
+                com.hubitat.app.ChildDeviceWrapper child=addChildDevice("hubitat", "Generic Component RGBW", "${device.id}-$i-2-L", [completedSetup: true, label: "${device.displayName} (Zone$i) Light", isComponent: true, componentName: "zone$i", componentLabel: "Zone $i"])
             }
             if (!settings."sceneCaptureZ$i") {
-                if(!getChildDevice("${device.deviceNetworkid}-$i-2-B")) {
-                    com.hubitat.app.ChildDeviceWrapper child=addChildDevice("hubitat", "Generic Component Button Controller", "${device.deviceNetworkId}-$i-2-B", [completedSetup: true, label: "${device.displayName} (Zone$i) Buttons", isComponent: true, componentName: "zone$i", componentLabel: "Zone $i"])
+                if(getChildDevice("${device.deviceNetworkId}-$i-2-B")) {
+                    // remove legacy naming
+                    deleteChildDevice("${device.deviceNetworkId}-$i-2-B")
+                }
+                if(!getChildDevice("${device.id}-$i-2-B")) {
+                    com.hubitat.app.ChildDeviceWrapper child=addChildDevice("hubitat", "Generic Component Button Controller", "${device.id}-$i-2-B", [completedSetup: true, label: "${device.displayName} (Zone$i) Buttons", isComponent: true, componentName: "zone$i", componentLabel: "Zone $i"])
                     if (getDataValue("deviceId")=="41222") {
                         child.parse([[name: "numberOfButtons", value: 0]])
                     } else {
@@ -111,7 +120,11 @@ void updated() {
                 }
             } else {
                 if(getChildDevice("${device.deviceNetworkid}-$i-2-B")) {
+                    // legacy naming
                     deleteChildDevice("${device.deviceNetworkId}-$i-2-B")
+                }
+                if(getChildDevice("${device.id}-$i-2-B")) {
+                    deleteChildDevice("${device.id}-$i-2-B")
                 }
             }
             cmds.addAll(addHubMultiChannel(i))
@@ -124,6 +137,12 @@ void updated() {
             }
             if (getChildDevice("${device.deviceNetworkId}-$i-2-B")) {
                 deleteChildDevice("${device.deviceNetworkId}-$i-2-B")
+            }
+            if (getChildDevice("${device.id}-$i-2-B")) {
+                deleteChildDevice("${device.id}-$i-2-B")
+            }
+            if (getChildDevice("${device.id}-$i-2-L")) {
+                deleteChildDevice("${device.id}-$i-2-L")
             }
             cmds.addAll(removeHubMultiChannel(i))
         }
