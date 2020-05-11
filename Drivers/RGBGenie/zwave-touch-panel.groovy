@@ -2,7 +2,7 @@
 *	Touch Panel Driver
 *	Code written for RGBGenie by Bryan Copeland
 *
-*   v2.1 - 2020-05-11
+*   v2.2 - 2020-05-11
 */
 
 
@@ -369,7 +369,7 @@ void epZwaveEvent(hubitat.zwave.commands.switchmultilevelv3.SwitchMultilevelRepo
 }
 
 void epZwaveEvent(hubitat.zwave.commands.switchcolorv3.SwitchColorSet cmd, short ep) {
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     if (child) {
         List<Map> evts=[]
         if (logEnable) log.debug "got SwitchColorReport: $cmd"
@@ -427,7 +427,7 @@ void epZwaveEvent(hubitat.zwave.commands.switchcolorv3.SwitchColorSet cmd, short
 
 void levelChanging(Map options){
     short ep=options.ep
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     int level=0
     if (options.upDown) {
         level=options.level-5
@@ -448,7 +448,7 @@ void levelChanging(Map options){
 }
 
 void epZwaveEvent(hubitat.zwave.commands.switchmultilevelv3.SwitchMultilevelStartLevelChange cmd, short ep){
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     if (child) {
         runInMillis(500, levelChanging, [data: [upDown: cmd.upDown, level: child.currentValue("level"), ep: ep]])
     }
@@ -459,7 +459,7 @@ void epZwaveEvent(hubitat.zwave.commands.switchmultilevelv3.SwitchMultilevelStop
 }
 
 void epZwaveEvent(hubitat.zwave.commands.switchmultilevelv3.SwitchMultilevelSet cmd, short ep) {
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     if (child) {
         List<Map> evts=[]
         evts.add([name: "level", value: cmd.value])
@@ -473,7 +473,7 @@ void epZwaveEvent(hubitat.zwave.commands.switchmultilevelv3.SwitchMultilevelSet 
 }
 
 private void dimmerEvents(hubitat.zwave.Command cmd, short ep) {
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     if (child) {
         List<Map> evts=[]
         String value = (cmd.value ? "on" : "off")
@@ -487,7 +487,7 @@ private void dimmerEvents(hubitat.zwave.Command cmd, short ep) {
 }
 
 void epZwaveEvent(hubitat.zwave.commands.sceneactuatorconfv1.SceneActuatorConfSet cmd, short ep) {
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     if (child) {
         if (settings."sceneCaptureZ${ep}") {
             if (!state.scene) {
@@ -499,14 +499,14 @@ void epZwaveEvent(hubitat.zwave.commands.sceneactuatorconfv1.SceneActuatorConfSe
                 state.scene."${ep}"."${cmd.sceneId}" = ["colorTemperature": child.currentValue("colorTemperature"), "level": child.currentValue("level"), "switch": child.currentValue("switch"), "colorMode": child.currentValue("colorMode")]
             }
         } else {
-            com.hubitat.app.ChildDeviceWrapper buttonChild=getChildDevice("${device.deviceNetworkId}-${ep}-2-B")
+            com.hubitat.app.ChildDeviceWrapper buttonChild=getChildDevice("${device.id}-${ep}-2-B")
             buttonChild.parse([[name: "pushed", value: (cmd.sceneId / 16)]])
         }
     }
 }
 
 void zwaveEvent(hubitat.zwave.commands.sceneactivationv1.SceneActivationSet cmd, short ep) {
-    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.deviceNetworkId}-${ep}-2-L")
+    com.hubitat.app.ChildDeviceWrapper child=getChildDevice("${device.id}-${ep}-2-L")
     if (child) {
         List<Map> evts=[]
         if (settings."sceneCaptureZ${ep}") {
@@ -517,7 +517,7 @@ void zwaveEvent(hubitat.zwave.commands.sceneactivationv1.SceneActivationSet cmd,
                 evts.add([name: k, value: v])
             }
         } else {
-            com.hubitat.app.ChildDeviceWrapper buttonChild = getChildDevice("${device.deviceNetworkId}-${ep}-2-B")
+            com.hubitat.app.ChildDeviceWrapper buttonChild = getChildDevice("${device.id}-${ep}-2-B")
             buttonChild.parse([[name: "held", value: (cmd.sceneId / 16)]])
         }
         child.parse(evts)
