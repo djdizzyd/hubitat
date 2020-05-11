@@ -1,6 +1,6 @@
 /**
  *  Inovelli Bulb Multi-White LZW41
- *  v2.1
+ *  v2.2 - 2020-05-11
  */
 
 import groovy.transform.Field
@@ -23,6 +23,7 @@ metadata {
 	}
 	preferences {
 		configParams.each { input it.value.input }
+		input name: "lowBandwidth", type: "bool", description: "Enable if seeing slow response, will also disable colorTransition", title: "Low Bandwidth", defaultValue: false
 		input name: "colorStaging", type: "bool", description: "", title: "Enable color pre-staging", defaultValue: false
 		input name: "colorTransition", type: "number", description: "", title: "Color fade time:", defaultValue: 0
 		input name: "dimmingSpeed", type: "number", description: "", title: "Dimming speed:", defaultValue: 1
@@ -65,6 +66,7 @@ void updated() {
 	log.info "updated..."
 	log.warn "debug logging is: ${logEnable == true}"
 	unschedule()
+	if (lowBandwidth) device.updateSetting("colorTransition", [value: "0", type: "number"])
 	if (logEnable) runIn(1800,logsOff)
 	runConfigs()
 }
@@ -199,7 +201,6 @@ void off() {
 	//Check if dimming speed exists and set the durration
 	def duration=0
 	if (dimmingSpeed) duration=dimmingSpeed.toInteger()
-
 	sendToDevice(zwave.switchMultilevelV2.switchMultilevelSet(value: 0x00, dimmingDuration: duration))
 }
 
@@ -219,7 +220,7 @@ void setLevel(level, duration) {
 void setColorTemperature(temp) {
 	if (logEnable) log.debug "setColorTemperature($temp)"
 	int dimmingDuration=0
-	if (colorTransition) dimmingDuration=colorTransition
+	if (colorTransition && !lowBandwidth) dimmingDuration=colorTransition
 	List<hubitat.zwave.Command> cmds = []
 	if (temp < COLOR_TEMP_MIN) temp = COLOR_TEMP_MIN
 	if (temp > COLOR_TEMP_MAX) temp = COLOR_TEMP_MAX
@@ -231,7 +232,7 @@ void setColorTemperature(temp) {
 		cmds.add(zwave.basicV1.basicSet(value: 0xFF))
 	}
 	sendToDevice(cmds)
-	runIn(dimmingDuration, "refreshColor")
+	if (colorTransition>0 || lowBandwidth) runIn(dimmingDuration, "refreshColor")
 }
 
 private void setGenericTempName(temp){

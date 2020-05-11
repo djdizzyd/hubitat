@@ -1,6 +1,6 @@
 /**
  *  Inovelli Bulb Multi-Color LZW42
- *  v2.1
+ *  v2.2 - 2020-05-11
  */
 
 import groovy.transform.Field
@@ -25,6 +25,7 @@ metadata {
     }
     preferences {
         configParams.each { input it.value.input }
+        input name: "lowBandwidth", type: "bool", description: "Enable if seeing slow response, will also disable colorTransition", title: "Low Bandwidth", defaultValue: false
         input name: "colorStaging", type: "bool", description: "", title: "Enable color pre-staging", defaultValue: false
         input name: "colorTransition", type: "number", description: "", title: "Color fade time:", defaultValue: 0
         input name: "dimmingSpeed", type: "number", description: "", title: "Dimming speed:", defaultValue: 1
@@ -73,6 +74,7 @@ void updated() {
     log.info "updated..."
     log.warn "debug logging is: ${logEnable == true}"
     unschedule()
+    if (lowBandwidth) device.updateSetting("colorTransition", [value: "0", type: "number"])
     if (logEnable) runIn(1800,logsOff)
     runConfigs()
 }
@@ -257,7 +259,7 @@ void setColor(value) {
     if (value.level == null) value.level=100
     if (logEnable) log.debug "setColor($value)"
     int dimmingDuration=0
-    if (colorTransition) dimmingDuration=colorTransition
+    if (colorTransition && !lowBandwidth) dimmingDuration=colorTransition
     List<hubitat.zwave.Command> cmds = []
     List rgb = hubitat.helper.ColorUtils.hsvToRGB([value.hue, value.saturation, value.level])
     log.debug "r:" + rgb[0] + ", g: " + rgb[1] +", b: " + rgb[2]
@@ -272,13 +274,13 @@ void setColor(value) {
     }
     sendToDevice(cmds)
     eventProcess(name: "colorMode", value: "RGB", descriptionText: "${device.getDisplayName()} color mode is RGB")
-    runIn(dimmingDuration, "refreshColor")
+    if (colorTransition>0 || lowBandwidth) runIn(dimmingDuration, "refreshColor")
 }
 
 void setColorTemperature(temp) {
     if (logEnable) log.debug "setColorTemperature($temp)"
     int dimmingDuration=0
-    if (colorTransition) dimmingDuration=colorTransition
+    if (colorTransition && !lowBandwidth) dimmingDuration=colorTransition
     List<hubitat.zwave.Command> cmds = []
     if (temp < COLOR_TEMP_MIN) temp = COLOR_TEMP_MIN
     if (temp > COLOR_TEMP_MAX) temp = COLOR_TEMP_MAX
@@ -291,7 +293,7 @@ void setColorTemperature(temp) {
     }
     sendToDevice(cmds)
     eventProcess(name: "colorMode", value: "CT", descriptionText: "${device.getDisplayName()} color mode is CT")
-    runIn(dimmingDuration, "refreshColor")
+    if (colorTransition>0 || lowBandwidth) runIn(dimmingDuration, "refreshColor")
 }
 
 private void setGenericTempName(temp){
