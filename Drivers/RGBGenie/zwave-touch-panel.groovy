@@ -2,7 +2,7 @@
 *	Touch Panel Driver
 *	Code written for RGBGenie by Bryan Copeland
 *
-*   v2.2 - 2020-05-11
+*   v2.3 - 2020-05-11
 */
 
 
@@ -522,4 +522,19 @@ void zwaveEvent(hubitat.zwave.commands.sceneactivationv1.SceneActivationSet cmd,
         }
         child.parse(evts)
     }
+}
+
+void componentRefresh(d){noCommands(d,"refresh")}
+void componentOn(d){noCommands(d,"on")}
+void componentOff(d){noCommands(d,"off")}
+void componentSetLevel(d,l){noCommands(d,"setLevel")}
+void componentStartLevelChange(d,dr){noCommands(d,"startLevelChange")}
+void componentStopLevelChange(d){noCommands(d,"stopLevelChange")}
+void componentSetColor(d,v) {noCommands(d,"setColor")}
+void componentSetHue(d,v){noCommands(d,"setHue")}
+void componentSetSaturation(d,v){noCommands(d,"setSaturation")}
+void componentSetColorTemperature(d,v){noCommands(d,"setColorTemperature")}
+
+void noCommands(d, cmd) {
+    if (logEnable) log.trace "Command ${cmd} is not implemented on ${d.displayName}"
 }
