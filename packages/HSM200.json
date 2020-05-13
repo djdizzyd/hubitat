@@ -1,0 +1,17 @@
+{
+  "packageName": "HomeSeer HSM200 Multi Sensor",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-homeseer-hsm200-multi-sensor/39899?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "d51aef98-fa95-4a52-8ca7-cbf3ed692c0a",
+      "name": "HomeSeer HSM200 Multi Sensor Driver",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/HomeSeer/HSM200-Multi-Sensor.groovy",
+      "required": true
+    }
+  ]
+}
