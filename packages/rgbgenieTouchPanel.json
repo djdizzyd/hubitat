@@ -1,0 +1,17 @@
+{
+  "packageName": "RGBGenie Z-Wave Touch Panel",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "2.3",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-rgbgenie-z-wave-device-drivers-all/34999?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "69bb3965-a6ee-4004-852d-21cce42c89a6",
+      "name": "RGBGenie Z-Wave Touch Panel Driver",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/RGBGenie/zwave-touch-panel.groovy",
+      "required": true
+    }
+  ]
+}

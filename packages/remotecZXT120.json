@@ -1,0 +1,17 @@
+{
+  "packageName": "Remotec ZXT-120",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/beta-release-remotec-zxt-120/40004?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "d8834bd4-7c29-4902-a51c-236cd5506d10",
+      "name": "Remotec ZXT-120 Driver",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Remotec/ZXT-120.groovy",
+      "required": true
+    }
+  ]
+}

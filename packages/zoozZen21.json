@@ -1,0 +1,17 @@
+{
+  "packageName": "Zooz Zen 21 Switch",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-advanced-zooz-zen22-zen21-central-scene-dimmer-and-switch-drivers/39761?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "3a52744e-0521-43a0-ab1e-eb863fab7797",
+      "name": "Zooz Zen 21 Switch",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/zooz/zen21-switch.groovy",
+      "required": true
+    }
+  ]
+}

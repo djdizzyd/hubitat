@@ -1,0 +1,17 @@
+{
+  "packageName": "Inovelli 4-in-1 Sensor",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.2",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-improved-lzw-60-inovelli-4-in-1-sensor-driver/37744?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "8c8b3159-586c-46b8-a999-327683f3e230",
+      "name": "Inovelli 4-in-1 Sensor Driver",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/inovelli/inovelli-4-in-1-sensor.groovy",
+      "required": true
+    }
+  ]
+}

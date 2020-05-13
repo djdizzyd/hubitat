@@ -1,0 +1,17 @@
+{
+  "packageName": "Zooz Zen 24 Dimmer",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-advanced-zooz-zen24-zen23-central-scene-dimmer-and-switch-drivers/39766?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "3d9822ff-af01-4c60-9d03-456ae9715882",
+      "name": "Zooz Zen 24 Dimmer",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/zooz/zen24-dimmer.groovy",
+      "required": true
+    }
+  ]
+}

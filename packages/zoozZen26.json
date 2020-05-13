@@ -1,0 +1,17 @@
+{
+  "packageName": "Zooz Zen 26 Switch",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.3",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-advanced-zooz-zen27-zen26-central-scene-dimmer-and-switch-drivers/38990?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "9fa43b02-902e-4a21-a07e-30ec8dd04370",
+      "name": "Zooz Zen 27 Dimmer",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/zooz/zen26-switch.groovy",
+      "required": true
+    }
+  ]
+}

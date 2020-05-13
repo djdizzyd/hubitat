@@ -1,0 +1,17 @@
+{
+  "packageName": "RGBGenie Z-Wave Micro Controller",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.0",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-rgbgenie-z-wave-device-drivers-all/34999?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "f714ca98-52d9-4806-8d4b-42e81d354eef",
+      "name": "RGBGenie Z-Wave LED Controller Driver",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/RGBGenie/zwave-micro-controller.groovy",
+      "required": true
+    }
+  ]
+}
