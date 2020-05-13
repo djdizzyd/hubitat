@@ -1,12 +1,7 @@
 /**
  *
  *  Inovelli 4-in-1 Sensor
- *  2020-04-09: Re-engineer of driver using current coding standards
- *                            Reduce un-necessary event log chatter (there was a lot of this)
- *                            Add TamperAlert capability
- *                            Standardize device info and add serialnumber, firmware version, protocol version, hardware version
- *                            Got rid of double / redundant motion events
- *  2020-04-24: Fix Major bug
+ *  v1.2
  */
 
 import groovy.transform.Field
