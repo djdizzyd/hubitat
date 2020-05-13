@@ -1,3 +1,8 @@
+/*
+*	Aeotec Range Extender 7
+*	version: 1.0
+*/
+
 import groovy.transform.Field
 
 metadata {

@@ -2,10 +2,9 @@
   "packageName": "Inovelli LZW42 Multi-Color Bulb",
   "minimumHEVersion": "2.1.9",
   "author": "Bryan Copeland",
-  "version": "1.0",
-  "dateReleased": "2020-04-21",
-  "licenseFile": "",
-  "releaseNotes": "",
+  "version": "2.2",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-inovelli-bulbs-drivers-lzw41-lzw42/30922?u=bcopeland",
   "drivers" : [
     {
       "id": "85a156b6-91e8-4e7e-9895-b2a432a7172c",

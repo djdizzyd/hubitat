@@ -1,7 +1,7 @@
 {
   "author": "Bryan Copeland",
   "gitHubUrl": "https://github.com/djdizzyd",
-  "payPalUrl": "https://ko-fi.com/A0A01MOZK",
+  "payPalUrl": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CZNQNCDF62YM8&source=url",
   "packages": [
     {
       "name": "Aeotec Range Extender 7",
@@ -10,22 +10,40 @@
       "description": "Aeotec Range Extender 7 Driver"
     },
     {
+      "name": "Aeotec Water Sensor 6",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/aeotecWaterSensor6.json",
+      "description": "Aeotec Water Sensor 6 Driver"
+    },
+    {
       "name": "GoControl Thermostat",
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/gocontrolThermostat.json",
       "description": "Advanced GoControl GC-TBZ48 Thermostat Driver"
     },
     {
-      "name": "Honeywell T6 Pro Thermostat",
+      "name": "HomeSeer HS-FLS100+ Floodlight Sensor",
       "category": "Integrations",
-      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/gocontrolThermostat.json",
-      "description": "Advanced Honeywell T6 Pro Thermostat Driver"
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/HS-FLS100.json",
+      "description": "HomeSeer HS-FLS100+ Floodlight Sensor Driver"
+    },
+    {
+      "name": "HomeSeer HSM200 Multi Sensor",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/HSM200.json",
+      "description": "HomeSeer HSM200 Multi Sensor Driver"
     },
     {
       "name": "Honeywell T6 Pro Thermostat",
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/honeywellT6Pro.json",
       "description": "Advanced Honeywell T6 Pro Thermostat Driver"
+    },
+    {
+      "name": "Inovelli 4-in-1 Sensor",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/inovelli4in1.json",
+      "description": "Inovelli 4-in-1 Sensor Driver"
     },
     {
       "name": "Inovelli Multi-White Bulb",
@@ -40,25 +58,49 @@
       "description": "Inovelli LZW42 Multi-Color Bulb Driver"
     },
     {
-      "name": "Ring Contact Sensor",
+      "name": "Remotec ZXT-120",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/remotecZXT120.json",
+      "description": "Remotec ZXT-120 Driver"
+    },
+    {
+      "name": "RGBGenie Z-Wave LED Controller",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/rgbgenieLEDController.json",
+      "description": "RGBGenie Z-Wave LED Controller Driver"
+    },
+    {
+      "name": "RGBGenie Z-Wave Touch Panel",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/rgbgenieTouchPanel.json",
+      "description": "RGBGenie Z-Wave Touch Panel Driver"
+    },
+    {
+      "name": "RGBGenie Z-Wave Micro Controller",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/rgbgenieMicroController.json",
+      "description": "RGBGenie Z-Wave Micro Controller Driver"
+    },
+    {
+      "name": "Ring Contact Sensor Gen1",
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringContactSensor.json",
       "description": "Ring Contact Sensor Driver"
     },
     {
-      "name": "Ring Motion Sensor",
+      "name": "Ring Motion Sensor Gen1",
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringMotionSensor.json",
       "description": "Ring Motion Sensor Driver"
     },
     {
-      "name": "Ring Range Extender",
+      "name": "Ring Range Extender Gen1",
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringRangeExtender.json",
       "description": "Ring Range Extender Driver"
     },
     {
-      "name": "Ring Smoke CO Listener",
+      "name": "Ring Smoke CO Listener Gen1",
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/ringSmokeCOListener.json",
       "description": "Ring Smoke CO Listener Driver"
@@ -67,7 +109,49 @@
       "name": "Z-Wave Firmware Updater",
       "category": "Utility",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zwaveFirmwareUpdater.json",
-      "description": "Z-Wave Firmware Updater Utility Driver"
+      "description": "Z-Wave Firmware Updater Integrations Driver"
+    },
+    {
+      "name": "Zooz Zen21 Switch",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen21.json",
+      "description": "Advanced Zooz Zen 21 Switch Driver"
+    },
+    {
+      "name": "Zooz Zen22 Dimmer",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen22.json",
+      "description": "Advanced Zooz Zen 22 Dimmer Driver"
+    },
+    {
+      "name": "Zooz Zen23 Switch",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen23.json",
+      "description": "Advanced Zooz Zen 23 Switch Driver"
+    },
+    {
+      "name": "Zooz Zen24 Dimmer",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen24.json",
+      "description": "Advanced Zooz Zen 24 Dimmer Driver"
+    },
+    {
+      "name": "Zooz Zen26 Switch",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen26.json",
+      "description": "Advanced Zooz Zen 26 Central Scene Switch Driver"
+    },
+    {
+      "name": "Zooz Zen27 Dimmer",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen27.json",
+      "description": "Advanced Zooz Zen 27 Central Scene Dimmer Driver"
+    },
+    {
+      "name": "Zooz Zen31 LED Controller",
+      "category": "Integrations",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen31.json",
+      "description": "Simplified Zooz Zen 31 Dimmer Driver"
     }
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "packageName": "Aeotec Water Sensor 6",
+  "minimumHEVersion": "2.1.9",
+  "author": "Bryan Copeland",
+  "version": "1.4",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-aeotec-water-sensor-6-w-dock/39292?u=bcopeland",
+  "drivers" : [
+    {
+      "id": "ba988fb0-ac75-41bd-b5fa-2a4807fea774",
+      "name": "Aeotec Water Sensor 6 Driver",
+      "namespace": "djdizzyd",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Aeotec/water-sensor-6.groovy",
+      "required": true
+    }
+  ]
+}

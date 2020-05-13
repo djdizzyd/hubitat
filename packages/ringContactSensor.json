@@ -4,8 +4,7 @@
   "author": "Bryan Copeland",
   "version": "1.0",
   "dateReleased": "2020-04-21",
-  "licenseFile": "",
-  "releaseNotes": "",
+  "communityLink": "https://community.hubitat.com/t/release-ring-range-extender-contact-sensor-motion-sensor-smoke-and-co-listener/37779?u=bcopeland",
   "drivers" : [
     {
       "id": "3c1260e0-63f2-4d83-9910-248dd0de6d66",

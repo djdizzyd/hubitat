@@ -4,8 +4,7 @@
   "author": "Bryan Copeland",
   "version": "1.0",
   "dateReleased": "2020-04-21",
-  "licenseFile": "",
-  "releaseNotes": "",
+  "communityLink": "https://community.hubitat.com/t/release-z-wave-firmware-updater/38237?u=bcopeland",
   "drivers" : [
     {
       "id": "848ef6df-5f64-4844-8693-77992bf8023d",

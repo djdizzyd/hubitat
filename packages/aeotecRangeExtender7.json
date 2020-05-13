@@ -4,14 +4,13 @@
   "author": "Bryan Copeland",
   "version": "1.0",
   "dateReleased": "2020-04-21",
-  "licenseFile": "",
-  "releaseNotes": "",
+  "communityLink": "https://community.hubitat.com/t/release-aeotec-range-extender-7-driver/37775?u=bcopeland",
   "drivers" : [
     {
       "id": "36a458c7-38f8-44b7-9d14-bc3e8d53ba5d",
       "name": "Aeotec Range Extender 7",
       "namespace": "djdizzyd",
-      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Aeotec-Range-Extender-7.src/Aeotec-Range-Extender-7.groovy",
+      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Aeotec/Aeotec-Range-Extender-7.groovy",
       "required": true
     }
   ]

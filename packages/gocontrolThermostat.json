@@ -2,10 +2,9 @@
   "packageName": "Advanced GoControl GC-TBZ48 Thermostat",
   "minimumHEVersion": "2.1.9",
   "author": "Bryan Copeland",
-  "version": "1.0",
-  "dateReleased": "2020-04-21",
-  "licenseFile": "",
-  "releaseNotes": "",
+  "version": "1.5",
+  "dateReleased": "2020-05-13",
+  "communityLink": "https://community.hubitat.com/t/release-advanced-gocontrol-gc-tbz48-thermostat-driver/37868?u=bcopeland",
   "drivers" : [
     {
       "id": "c3099d9f-a291-4cce-b915-bda000d7b163",
