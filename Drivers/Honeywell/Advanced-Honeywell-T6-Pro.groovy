@@ -2,7 +2,7 @@ import groovy.transform.Field
 
 /**
  * Advanced Honeywell T6 Pro
- * v1.1
+ * v1.2
  */
 
 metadata {
@@ -24,6 +24,9 @@ metadata {
         capability "RelativeHumidityMeasurement"
         capability "PowerSource"
 
+        attribute "currentSensorCal", "number"
+
+        command "SensorCal", [[name:"calibration",type:"ENUM", description:"Number of degrees to add/subtract from thermostat sensor", constraints:["-3", "-2", "-1", "0", "1", "2", "3"]]]
         command "syncClock"
 
         fingerprint  mfr:"0039", prod:"0011", deviceId:"0008", inClusters:"0x5E,0x85,0x86,0x59,0x31,0x80,0x81,0x70,0x5A,0x72,0x71,0x73,0x9F,0x44,0x45,0x40,0x42,0x43,0x6C,0x55", deviceJoinName: "Honeywell T6 PRO"
@@ -123,6 +126,13 @@ void updated() {
     if (logEnable) runIn(1800,logsOff)
     runConfigs()
     runEvery3Hours("syncClock")
+}
+
+void SensorCal(value) {
+    if (logEnable) log.debug "SensorCal($value)"
+    List<hubitat.zwave.Command> cmds=[]
+    cmds.addAll(configCmd(42,1,value))
+    sendToDevice(cmds)
 }
 
 void zwaveEvent(hubitat.zwave.commands.notificationv3.NotificationReport cmd) {
@@ -237,7 +247,6 @@ List<hubitat.zwave.Command> configCmd(parameterNumber, size, scaledConfiguration
     if (intval<0) intval=256 + intval
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: parameterNumber.toInteger(), size: size.toInteger(), configurationValue: [(intval & 0xFF)]))
     cmds.add(zwave.configurationV1.configurationGet(parameterNumber: parameterNumber.toInteger()))
-
     return cmds
 }
 
@@ -248,6 +257,9 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
         Map configParam=configParams[cmd.parameterNumber.toInteger()]
         if (scaledValue > 127) scaledValue = scaledValue - 256
         device.updateSetting(configParam.input.name, [value: "${scaledValue}", type: configParam.input.type])
+        if (cmd.parameterNumber==42) {
+            eventProcess(name: "currentSensorCal", value: scaledValue)
+        }
     }
 }
 
