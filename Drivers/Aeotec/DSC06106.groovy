@@ -1,6 +1,6 @@
 /*
-*	Aeotec DSC06106 Energy Switch
-*	version: 0.4b
+*	Aeotec DSC06106 Smart Energy Switch
+*	version: 1.0
 */
 
 import groovy.transform.Field
