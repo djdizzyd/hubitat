@@ -1,6 +1,6 @@
 /*
 *	Aeotec DSC06106 Energy Switch
-*	version: 0.2b
+*	version: 0.3b
 */
 
 import groovy.transform.Field
@@ -133,7 +133,7 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
     switch (cmd.sensorType) {
         case 4:
             evt.name = "power"
-            evt.value = cmd.scaledSensorValue
+            evt.value = "${cmd.scaledSensorValue}"
             evt.unit = "W"
             evt.descriptionText="${device.displayName} power is: ${evt.value}W"
             eventProcess(evt)
@@ -148,14 +148,14 @@ void zwaveEvent(hubitat.zwave.commands.meterv2.MeterReport cmd) {
         switch (cmd.scale) {
             case 0:
                 evt.name = "energy"
-                evt.value = cmd.scaledMeterValue
+                evt.value = "${cmd.scaledMeterValue}"
                 evt.unit = "kWh"
                 evt.descriptionText="${device.displayName} energy is: ${evt.value}"
                 eventProcess(evt)
                 break
             case 5:
                 evt.name = "voltage"
-                evt.value = cmd.scaleMeterValue
+                evt.value = "${cmd.scaledMeterValue}"
                 evt.uit = "V"
                 evt.descriptionText="${device.displayName} voltage is: ${evt.value}"
                 eventProcess(evt)
