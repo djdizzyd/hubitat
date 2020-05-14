@@ -1,6 +1,6 @@
 /*
 *	Aeotec DSC06106 Energy Switch
-*	version: 0.1b
+*	version: 0.2b
 */
 
 import groovy.transform.Field
@@ -15,6 +15,7 @@ metadata {
         capability "Switch"
         capability "PowerMeter"
         capability "EnergyMeter"
+        capability "VoltageMeasurement"
         capability "Polling"
 
         fingerprint mfr:"0086", prod:"0003", deviceId:"0006", inClusters:"0x25,0x31,0x32,0x27,0x70,0x85,0x72,0x86", outClusters:"0x82", deviceJoinName: "Aeotec DSC06106"
@@ -26,11 +27,11 @@ metadata {
     }
 }
 @Field static Map configParams = [
-        90: [input: [name: "configParam90", type: "enum", title: "Report Type", description: "", defaultValue: 0, options:[0:"Time Interval",1:"Change in Watts"]], parameterSize: 1],
-        91: [input: [name: "configParam91", type: "number", title: "Watts Change Report", description:"W 0-32000", defaultValue: 50, range: "0..32000",], parameterSize:2],
-        92: [input: [name: "configParam92", type: "number", title: "Watts Change Percent Report", description:"% 0-99", defaultValue: 10, range: "0..99"], parameterSize:1],
-        111: [input: [name: "configParam111", type: "number", title: "Seconds for W report", description:"seconds 0-65000", defaultValue: 10, range: "0..65000"], parameterSize:4],
-        112: [input: [name: "configParam112", type: "number", title: "Seconds for kWh report", description:"seconds 0-65000", defaultValue: 60, range: "0..65000"], parameterSize:4]
+        90: [input: [name: "configParam90", type: "enum", title: "Report Type", description: "", defaultValue: 0, options:[0:"Time Interval Only",1:"Time and Change in Watts"]], parameterSize: 1],
+        91: [input: [name: "configParam91", type: "number", title: "Minimum Watts Change Report", description:"W 0-32000", defaultValue: 50, range: "0..32000",], parameterSize:2],
+        92: [input: [name: "configParam92", type: "number", title: "Minimum Watts Change Percent Report", description:"% 0-99", defaultValue: 10, range: "0..99"], parameterSize:1],
+        111: [input: [name: "configParam111", type: "number", title: "Seconds for W report", description:"seconds 0-65000", defaultValue: 300, range: "0..65000"], parameterSize:4],
+        112: [input: [name: "configParam112", type: "number", title: "Seconds for kWh report", description:"seconds 0-65000", defaultValue: 3600, range: "0..65000"], parameterSize:4]
 ]
 @Field static Map CMD_CLASS_VERS=[0x86:1,0x72:1,0x85:1,0x70:1,0x32:2,0x31:3,0x25:1]
 
@@ -99,15 +100,17 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
 
 void pollDeviceData() {
     List<hubitat.zwave.Command> cmds = []
+    cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 1, size: 1, scaledConfigurationValue: 1))
     cmds.add(zwave.versionV1.versionGet())
     cmds.addAll(processAssociations())
     cmds.addAll(pollConfigs())
-    cmds.add(zwave.sensorMultilevelV3.sensorMultilevelGet())
     cmds.add(zwave.switchBinaryV1.switchBinaryGet())
+    cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 80, size: 1, scaledConfigurationValue: 2))
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 101, size: 4, scaledConfigurationValue: 2))
-    cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 101, size: 4, scaledConfigurationValue: 8))
+    cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 102, size: 4, scaledConfigurationValue: 8))
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 103, size: 4, scaledConfigurationValue: 0))
     cmds.add(zwave.configurationV1.configurationSet(parameterNumber: 113, size: 4, scaledConfigurationValue: 0))
+    cmds.add(zwave.sensorMultilevelV3.sensorMultilevelGet())
     sendToDevice(cmds)
 }
 
@@ -189,14 +192,23 @@ void zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
     switchEvents(cmd)
 }
 
+void zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
+    if (logEnable) log.debug cmd
+    switchEvents(cmd)
+}
+
 void on() {
     state.isDigital=true
-    sendToDevice(zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF))
+    List<hubitat.zwave.Command> cmds=[]
+    cmds.add(zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF))
+    sendToDevice(cmds)
 }
 
 void off() {
     state.isDigital=true
-    sendToDevice(zwave.switchBinaryV1.switchBinarySet(switchValue: 0x00))
+    List<hubitat.zwave.Command> cmds=[]
+    cmds.add(zwave.switchBinaryV1.switchBinarySet(switchValue: 0x00))
+    sendToDevice(cmds)
 }
 
 void parse(String description) {
