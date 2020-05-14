@@ -13,7 +13,6 @@ metadata {
         capability "Battery"
         capability "ContactSensor"
         capability "Configuration"
-        capability "TamperAlert"
 
         fingerprint mfr:"017F", prod:"0100", deviceId:"0001", inClusters:"0x5E,0x86,0x72,0x5A,0x73,0x80,0x71,0x30,0x85,0x59,0x84,0x70", deviceJoinName: "Wink Lookout Door/Window Sensor"
     }
