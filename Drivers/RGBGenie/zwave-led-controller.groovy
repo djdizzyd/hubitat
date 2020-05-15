@@ -7,7 +7,7 @@
 *   Updated 2020-04-11 Added duplicate event filtering
 *   Updated 2020-04-30 Updated CCT Range
 *   Updated 2020-05-01 Fixed stupid mistake on config updating
-*
+*   v1.0
 */
 
 
