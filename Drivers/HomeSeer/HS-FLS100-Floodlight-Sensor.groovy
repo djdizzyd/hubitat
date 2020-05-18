@@ -1,6 +1,6 @@
 /*
 *	HomeSeer HS-FLS100+ Floodlight Sensor
-*	version: 1.3
+*	version: 1.4
 */
 
 import groovy.transform.Field
@@ -150,7 +150,7 @@ void zwaveEvent(hubitat.zwave.commands.sensorbinaryv1.SensorBinaryReport cmd) {
 
 void zwaveEvent(hubitat.zwave.commands.notificationv4.NotificationReport cmd) {
     Map evt = [isStateChange:false]
-    log.info "Notification: " + ZWAVE_NOTIFICATION_TYPES[cmd.notificationType.toInteger()]
+    if (logEnable) log.info "Notification: " + ZWAVE_NOTIFICATION_TYPES[cmd.notificationType.toInteger()]
     if (cmd.notificationType==7) {
         // home security
         switch (cmd.event) {
