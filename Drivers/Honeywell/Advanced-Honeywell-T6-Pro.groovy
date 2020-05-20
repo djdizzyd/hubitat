@@ -25,8 +25,10 @@ metadata {
         capability "PowerSource"
 
         attribute "currentSensorCal", "number"
+        attribute "idleBrightness", "number"
 
         command "SensorCal", [[name:"calibration",type:"ENUM", description:"Number of degrees to add/subtract from thermostat sensor", constraints:["-3", "-2", "-1", "0", "1", "2", "3"]]]
+        command "IdleBrightness", [[name:"brightness",type:"ENUM", description:"Set idle brightness", constraints:["0", "1", "2", "3", "4", "5"]]]
         command "syncClock"
 
         fingerprint  mfr:"0039", prod:"0011", deviceId:"0008", inClusters:"0x5E,0x85,0x86,0x59,0x31,0x80,0x81,0x70,0x5A,0x72,0x71,0x73,0x9F,0x44,0x45,0x40,0x42,0x43,0x6C,0x55", deviceJoinName: "Honeywell T6 PRO"
@@ -132,6 +134,13 @@ void SensorCal(value) {
     if (logEnable) log.debug "SensorCal($value)"
     List<hubitat.zwave.Command> cmds=[]
     cmds.addAll(configCmd(42,1,value))
+    sendToDevice(cmds)
+}
+
+void IdleBrightness(value) {
+    if (logEnable) log.debug "IdleBrightness($value)"
+    List<hubitat.zwave.Command> cmds=[]
+    cmds.addAll(configCmd(39,1,value))
     sendToDevice(cmds)
 }
 
@@ -259,6 +268,9 @@ void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) 
         device.updateSetting(configParam.input.name, [value: "${scaledValue}", type: configParam.input.type])
         if (cmd.parameterNumber==42) {
             eventProcess(name: "currentSensorCal", value: scaledValue)
+        }
+        if (cmd.parameterNumber==39) {
+            eventProcess(name: "idleBrightness", value: scaledValue)
         }
     }
 }
