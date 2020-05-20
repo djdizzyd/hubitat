@@ -501,7 +501,6 @@ void zwaveEvent(hubitat.zwave.commands.thermostatfanstatev1.ThermostatFanStateRe
     if (logEnable) log.debug "Got thermostat fan state report: ${cmd}"
     String newstate=THERMOSTAT_FAN_STATE[cmd.fanOperatingState.toInteger()]
     if (logEnable) log.debug "Translated fan state: " + newstate
-    log.info "Fan state: " + newstate
     sendToDevice(zwave.configurationV1.configurationGet(parameterNumber: 52))
     if (newstate=="idle" && (device.currentValue("thermostatOperatingState")=="heating" || device.currentValue=="cooling")) sendToDevice(zwave.thermostatOperatingStateV1.thermostatOperatingStateGet())
 }
