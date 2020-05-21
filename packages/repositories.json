@@ -146,12 +146,6 @@
       "category": "Integrations",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen27.json",
       "description": "Advanced Zooz Zen 27 Central Scene Dimmer Driver"
-    },
-    {
-      "name": "Zooz Zen31 LED Controller",
-      "category": "Integrations",
-      "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/packages/zoozZen31.json",
-      "description": "Simplified Zooz Zen 31 Dimmer Driver"
     }
   ]
 }
