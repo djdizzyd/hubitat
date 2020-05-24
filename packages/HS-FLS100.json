@@ -8,7 +8,7 @@
   "drivers" : [
     {
       "id": "3196ba9e-503f-418d-81ec-c67dc66d2720",
-      "name": "HomeSeer HS-FLS100+ Floodlight Sensor Driver",
+      "name": "HomeSeer HS-FLS100+ Floodlight Sensor",
       "namespace": "djdizzyd",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/HomeSeer/HS-FLS100-Floodlight-Sensor.groovy",
       "required": true
