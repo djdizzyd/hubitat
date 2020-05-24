@@ -8,7 +8,7 @@
   "drivers" : [
     {
       "id": "d8834bd4-7c29-4902-a51c-236cd5506d10",
-      "name": "Remotec ZXT-120 Driver",
+      "name": "Remotec ZXT-120",
       "namespace": "djdizzyd",
       "location": "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Remotec/ZXT-120.groovy",
       "required": true
