@@ -1,7 +1,7 @@
 /**
  *
  *  Inovelli 4-in-1 Sensor
- *  v1.2
+ *  v1.3
  */
 
 import groovy.transform.Field
@@ -28,8 +28,6 @@ metadata {
         input description: "If battery powered, the configuration options (aside from temp, humidity, & lux offsets) will not be updated until the sensor wakes up (once every 24-Hours). To manually wake up the sensor, press the button on the back 3 times quickly.", title: "Settings", displayDuringSetup: false, type: "paragraph", element: "paragraph"
         configParams.each { input it.value.input }
         input name: "temperatureOffset", type: "number", title: "Temperature Offset Adjust the reported temperature by this positive or negative value Range: -10.0..10.0 Default: 0.0", range: "-10.0..10.0", defaultValue: 0
-        input name: "humidityOffset", type: "number", title: "Humidity Offset", Description: "Adjust the reported humidity percentage by this positive or negative value Range: -10 ..10 Default: 0", range: "-10..10", defaultValue: 0
-        input name: "luminanceOffset", type: "number", title: "Luminance Offset", Description: "Adjust the reported luminance by this positive or negative value Range: -100..100 Default: 0", range: "-100..100", defaultValue: 0
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
@@ -75,8 +73,6 @@ void updated() {
     unschedule()
     if (logEnable) runIn(1800,logsOff)
     if (state.realTemperature != null) eventProcess(name:"temperature", value: getAdjustedTemp(state.realTemperature))
-    if (state.realHumidity != null) eventProcess(name:"humidity", value: getAdjustedHumidity(state.realHumidity))
-    if (state.realLuminance != null) eventProcess(name:"illuminance", value: getAdjustedLuminance(state.realLuminance))
     state.configUpdated=true
 }
 
@@ -121,8 +117,7 @@ void pollDeviceData() {
 
 void refresh() {
     List<hubitat.zwave.Command> cmds=[]
-    log.info "${device.displayName}: refresh()"
-    log.debug "Refresh Double Press"
+    if(logEnable) log.debug "${device.displayName}: refresh()"
     // get configs
     cmds.add(zwave.batteryV1.batteryGet())
     cmds.add(zwave.sensorMultilevelV5.sensorMultilevelGet(sensorType:1, scale:1))
@@ -210,13 +205,11 @@ String secureCommand(hubitat.zwave.Command cmd) {
 }
 
 String secureCommand(String cmd) {
-    String encap=""
     if (getDataValue("zwaveSecurePairingComplete") != "true") {
         return cmd
     } else {
-        encap = "988100"
+        return "988100${cmd}"
     }
-    return "${encap}${cmd}"
 }
 
 
@@ -260,7 +253,7 @@ void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpIntervalReport cmd) {
 }
 
 void zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
-    log.info "${device.displayName} Device wakeup notification"
+    if(logEnable) log.debug "${device.displayName} Device wakeup notification"
     // let's do some wakeup stuff here
     List<hubitat.zwave.Command> cmds=[]
     cmds.add(zwave.batteryV1.batteryGet())
@@ -284,13 +277,13 @@ void zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {
         evt.descriptionText = "${device.displayName} battery is ${cmd.batteryLevel}%"
         evt.value = "${cmd.batteryLevel}"
     }
-    if (txtEnable) log.info evt.descriptionText
+    if (logEnable) log.info evt.descriptionText
     eventProcess(evt)
 }
 
 void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
     if (logEnable) log.debug "${cmd}"
-    Map evt = [isStateChange:false]
+    Map evt = [:]
     if (cmd.notificationType==7) {
         // home security
         switch (cmd.event) {
@@ -298,101 +291,48 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
                 // state idle
                 if (cmd.eventParametersLength > 0) {
                     switch (cmd.eventParameter[0]) {
-                        case 3:
-                            evt.name = "tamper"
-                            evt.value = "clear"
-                            evt.isStateChange = true
-                            evt.descriptionText = "${device.displayName} tamper alert cover closed"
-                            break
                         case 7:
                             evt.name = "motion"
                             evt.value = "inactive"
-                            evt.isStateChange = true
                             evt.descriptionText = "${device.displayName} motion became ${evt.value}"
+                            eventProcess(evt)
                             break
                         case 8:
                             evt.name = "motion"
                             evt.value = "inactive"
-                            evt.isStateChange = true
                             evt.descriptionText = "${device.displayName} motion became ${evt.value}"
+                            eventProcess(evt)
                             break
                     }
                 } else {
                     log.debug "0 length event parameter"
                 }
                 break
-            case 3:
-                // Tampering cover removed
-                evt.name = "tamper"
-                evt.value = "detected"
-                evt.isStateChange = true
-                evt.descriptionText = "${device.displayName} tamper alert cover removed"
-                //deviceWakeup()
-                break
             case 7:
                 // motion detected (location provided)
                 evt.name = "motion"
                 evt.value = "active"
-                evt.isStateChange = true
                 evt.descriptionText = "${device.displayName} motion became ${evt.value}"
+                eventProcess(evt)
                 break
             case 8:
                 // motion detected
                 evt.name = "motion"
                 evt.value = "active"
-                evt.isStateChange = true
                 evt.descriptionText = "${device.displayName} motion became ${evt.value}"
+                eventProcess(evt)
                 break
             case 254:
                 // unknown event/state
                 log.warn "Device sent unknown event / state notification"
                 break
         }
-    } else if (cmd.notificationType==8) {
-        // power management
-        switch (cmd.event) {
-            case 0:
-                // idle
-                break
-            case 1:
-                // Power has been applied
-                log.info "${device.displayName} Power has been applied"
-                break
-            case 2:
-                // AC mains disconnected
-                evt.name = "powerSource"
-                evt.isStateChange = true
-                evt.value = "battery"
-                evt.descriptionText = "${device.displayName} AC mains disconnected"
-                break
-            case 3:
-                // AC mains re-connected
-                evt.name = "powerSource"
-                evt.isStateChange = true
-                evt.value = "mains"
-                evt.descriptionText = "${device.displayName} AC mains re-connected"
-                break
-        }
-    } else if (cmd.notificationType==20) {
-        // might do something more with this later
-        switch (cmd.event) {
-            case 1:
-                log.info "Light detected"
-                break
-            case 2:
-                log.info "Light color transition detected"
-                break
-        }
-    }
-    if (evt.isStateChange) {
-        if (txtEnable) log.info evt.descriptionText
-        eventProcess(evt)
     }
 }
 
 void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport cmd) {
     if (logEnable) log.debug "${cmd}"
-    Map evt = [isStateChange:false]
+    Map evt = [:]
     switch (cmd.sensorType) {
         case 1:
             evt.name="temperature"
@@ -400,29 +340,23 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
             state.realTemperature = realTemp
             evt.value=getAdjustedTemp(realTemp)
             evt.unit=getTemperatureScale()
-            evt.isStateChange=true
-            evt.description="${device.displayName}: Temperature report received: ${evt.value}"
+            evt.description="${device.displayName}: Temperature report received: ${evt.value}${evt.unit}"
+            eventProcess(evt)
             break
         case 3:
             evt.name = "illuminance"
-            state.realLuminance = cmd.scaledSensorValue.toInteger()
-            evt.value = getAdjustedLuminance(cmd.scaledSensorValue.toInteger())
-            evt.unit = "lux"
-            evt.isStateChange=true
-            evt.description="${device.displayName}: Illuminance report received: ${evt.value}"
+            evt.value = cmd.scaledSensorValue.toInteger()
+            evt.unit = "Lux"
+            evt.description="${device.displayName}: Illuminance report received: ${evt.value}${evt.unit}"
+            eventProcess(evt)
             break
         case 5:
             evt.name = "humidity"
-            state.realHumidity = cmd.scaledSensorValue.toInteger()
-            evt.value = getAdjustedHumidity(cmd.scaledSensorValue.toInteger())
+            evt.value = cmd.scaledSensorValue.toInteger()
             evt.unit = "%"
-            evt.isStateChange=true
-            evt.description="${device.displayName}: Humidity report received: ${evt.value}"
+            evt.description="${device.displayName}: Humidity report received: ${evt.value}${evt.unit}"
+            eventProcess(evt)
             break;
-    }
-    if (evt.isStateChange) {
-        if (txtEnable) log.info evt.descriptionText
-        eventProcess(evt)
     }
 }
 
@@ -442,20 +376,4 @@ private double getAdjustedTemp(value) {
     }
 }
 
-private double getAdjustedHumidity(value) {
-    value = Math.round((value as Double) * 100) / 100
-    if (settings.humidityOffset) {
-        return value =  value + Math.round(settings.humidityOffset * 100) /100
-    } else {
-        return value
-    }
-}
 
-private double getAdjustedLuminance(value) {
-    value = (Math.round((value as Double) * 100) / 100) as Integer
-    if (settings.luminanceOffset) {
-        return value =  value + Math.round(settings.luminanceOffset * 100) /100
-    } else {
-        return value
-    }
-}
