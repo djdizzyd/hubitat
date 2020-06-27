@@ -449,7 +449,11 @@ void zwaveEvent(hubitat.zwave.commands.sensormultilevelv5.SensorMultilevelReport
         eventProcess(name: "temperature", value: cmd.scaledSensorValue, unit: cmd.scale == 1 ? "F" : "C")
     } else if (cmd.sensorType.toInteger() == 5) {
         if (logEnable) log.debug "got temp: ${cmd.scaledSensorValue}"
-        eventProcess(name: "humidity", value: Math.round(cmd.scaledSensorValue), unit: cmd.scale == 0 ? "%": "g/m³")
+        if (cmd.scaledSensorValue >= 0 && cmd.scaledSensorValue <= 100) {
+            eventProcess(name: "humidity", value: Math.round(cmd.scaledSensorValue), unit: cmd.scale == 0 ? "%": "g/m³")
+        } else {
+            log.info "Skipped processing humidity sensor value: ${cmd.scaledSensorValue}"
+        }
     }
 }
 
