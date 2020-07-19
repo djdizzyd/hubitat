@@ -274,6 +274,7 @@ void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareMdReport cmd) 
     if (debugEnable) log.debug "FirmwareMDReport: ${cmd}"
     if (debugEnable) log.debug "firmwareMdReport: checksum ${cmd.checksum} firmwareId: ${cmd.firmwareId} manufacturerId: ${cmd.manufacturerId} maxFragmentSize: ${cmd.maxFragmentSize} firmwareTargets: ${cmd.numberOfTargets}"
     firmwareTargets[cmd.firmwareId] = 0
+    if (theFirmwareTarget==0) firmwareDescriptor['firmwareId']=cmd.firmwareId
     int target=1
     if (cmd.firmwareIds.size() > 0) {
         cmd.firmwareIds.each {
