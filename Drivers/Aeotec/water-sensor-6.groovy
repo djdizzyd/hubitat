@@ -66,7 +66,7 @@ void updated() {
     unschedule()
     if (logEnable) runIn(1800,logsOff)
     if (state.sleepy) {
-        state.configUpdated
+        state.configUpdated=true
     } else {
         List<hubitat.zwave.Command> cmds = []
         cmds.addAll(runConfigs())
