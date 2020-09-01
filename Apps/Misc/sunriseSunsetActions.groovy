@@ -1,11 +1,11 @@
 definition(
-    name: "SunriseSunset",
-    namespace: "djdizzyd",
-    author: "Bryan Copeland",
-    description: "My Sunrise/Sunset Rules",
-    category: "Convenience",
-    iconUrl: "",
-    iconX2Url: "")
+		name: "SunriseSunset",
+		namespace: "djdizzyd",
+		author: "Bryan Copeland",
+		description: "My Sunrise/Sunset Rules",
+		category: "Convenience",
+		iconUrl: "",
+		iconX2Url: "")
 
 preferences {
 	page(name: "mainPage")
@@ -27,7 +27,7 @@ def mainPage() {
 
 def appButtonHandler(btn) {
 	switch(btn) {
-		case "testSunset": 
+		case "testSunset":
 			sunsetActions()
 			break;
 		case "testSunrise":
@@ -60,7 +60,7 @@ def sunsetHandler(evt) {
 }
 
 def initialize() {
-	
+
 }
 
 def scheduleUpdate() {
@@ -90,7 +90,7 @@ def sunsetActions() {
 	for (dev in sunsetDevsOn) {
 		log.debug "Turning on " + dev.getDisplayName()
 		dev.on()
-	}    
+	}
 	for (dev in ctBulbDevs) {
 		dev.setColorTemperature(2700)
 		log.debug "Setting CT to 2700 on " + dev.getDisplayName()
