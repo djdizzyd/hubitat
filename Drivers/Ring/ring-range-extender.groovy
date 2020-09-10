@@ -1,6 +1,8 @@
 /*
 *	Ring Alarm Range Extender Gen 1 / Gen 2
 *	version: 2.0
+*  2020-09-08 Added initialize method to reset device's powerState when Hub reboots. Arn Burkhoff
+*  				Change ZWAVE_NOTIFICATION_TYPES from Map to Table. Corrrects invalid log.info data
 */
 
 import groovy.transform.Field
@@ -8,13 +10,14 @@ import groovy.transform.Field
 metadata {
 
     definition (name: "Ring Alarm Range Extender", namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Ring/ring-range-extender.groovy") {
-        capability "Actuator"
-        capability "Refresh"
-        capability "Sensor"
-        capability "Configuration"
-        capability "Battery"
-        capability "PowerSource"
-
+		capability "Actuator"
+		capability "Refresh"
+		capability "Sensor"
+		capability "Configuration"
+		capability "Battery"
+		capability "PowerSource"
+		capability "Initialize"
+		
         fingerprint mfr:"0346", prod:"0401", deviceId:"0201", inClusters:"0x5E,0x85,0x59,0x55,0x86,0x72,0x5A,0x73,0x9F,0x80,0x71,0x6C,0x70,0x7A", deviceJoinName: "Ring Alarm Range Extender" //US
         fingerprint mfr:"0346", prod:"0401", deviceId:"0202", inClusters:"0x5E,0x85,0x59,0x55,0x86,0x72,0x5A,0x73,0x9F,0x80,0x71,0x6C,0x70,0x7A", deviceJoinName: "Ring Alarm Range Extender" //UK
         fingerprint mfr:"0346", prod:"0401", deviceId:"0301", inClusters:"0x5E,0x59,0x85,0x80,0x70,0x5A,0x7A,0x87,0x72,0x8E,0x71,0x73,0x9F,0x6C,0x55,0x86", deviceJoinName: "Ring Alarm Range Extender 2" //US
@@ -32,20 +35,20 @@ metadata {
         1: [input: [name: "configParam1", type: "number", title: "Battery Report Interval", description: "minutes", range: "4..70", defaultValue: 70], parameterSize: 1],
 ]
 @Field static Map CMD_CLASS_VERS=[0x86:2,0x70:1,0x20:1]
-@Field static Map ZWAVE_NOTIFICATION_TYPES=[
-        0:"Reserverd",
-        1:"Smoke",
-        2:"CO",
-        3:"CO2",
-        4:"Heat",
-        5:"Water",
-        6:"Access Control",
-        7:"Home Security",
-        8:"Power Management",
-        9:"System",
-        10:"Emergency",
-        11:"Clock",
-        12:"First"
+@Field static List ZWAVE_NOTIFICATION_TYPES=[
+        "Reserverd",
+        "Smoke",
+        "CO",
+        "CO2",
+        "Heat",
+        "Water",
+        "Access Control",
+        "Home Security",
+        "Power Management",
+        "System",
+        "Emergency",
+        "Clock",
+        "First"
 ]
 
 void logsOff(){
@@ -115,8 +118,13 @@ void configure() {
     runIn(5,pollDeviceData)
 }
 
+void initialize() 	{refresh()}
 void refresh() {
-
+/*	 current state return a requested power management response. failing command issues a x'00' */
+  def cmds = []
+  cmds << zwave.notificationV3.notificationGet(notificationType: 8, v1AlarmType: 0, event: 0x03)	//on mains?
+  cmds << zwave.notificationV3.notificationGet(notificationType: 8, v1AlarmType: 0, event: 0x02)	//on battery?
+  sendToDevice(cmds)
 }
 
 void pollDeviceData() {
@@ -212,7 +220,7 @@ void zwaveEvent(hubitat.zwave.commands.versionv2.VersionReport cmd) {
 
 void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
     Map evt = [isStateChange:false]
-    log.info "Notification: " + ZWAVE_NOTIFICATION_TYPES[cmd.notificationType]
+    if (logEnable) log.info "Notification: " + ZWAVE_NOTIFICATION_TYPES[cmd.notificationType]
     if (cmd.notificationType==4) {
         // heat alarm
         switch (cmd.event) {
@@ -368,6 +376,7 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
         }
     } else if (cmd.notificationType==8) {
         // power management
+		if (logEnable) log.debug "${device.displayName} power event code: ${cmd.event}" 	
         switch (cmd.event) {
             case 0:
                 // idle
@@ -449,9 +458,12 @@ void zwaveEvent(hubitat.zwave.commands.notificationv8.NotificationReport cmd) {
             case 18:
                 // backup battery disconnected
                 break
-            case 254:
+//    	    case 254:
+			default:
+				log.info "unknown power event code: ${cmd.event}"
                 // unknown event / state
                 break
+                
         }
     }
     if (evt.isStateChange) {
@@ -496,4 +508,3 @@ String secureCommand(String cmd) {
     }
     return "${encap}${cmd}"
 }
-
