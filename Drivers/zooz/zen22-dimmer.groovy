@@ -15,6 +15,8 @@ metadata {
         capability "Configuration"
         capability "ChangeLevel"
         capability "PushableButton"
+        capability "HoldableButton"
+        capability "ReleasableButton"
         capability "Indicator"
 
         fingerprint mfr:"027A", prod:"B112", deviceId:"1F1C", inClusters:"0x5E,0x26,0x85,0x8E,0x59,0x55,0x86,0x72,0x5A,0x73,0x70,0x5B,0x9F,0x6C,0x7A", deviceJoinName: "Zooz Zen22 Dimmer" //US
@@ -134,7 +136,7 @@ void pollDeviceData() {
     cmds.add(zwave.manufacturerSpecificV2.deviceSpecificGet(deviceIdType: 1))
     cmds.addAll(processAssociations())
     cmds.addAll(pollConfigs())
-    sendEvent(name: "numberOfButtons", value: 8)
+    sendEvent(name: "numberOfButtons", value: 10)
     sendToDevice(cmds)
 }
 
@@ -362,6 +364,20 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==1) {
+            evt.value=1
+            evt.name="released"
+            evt.descriptionText="${device.displayName} button ${evt.value} released"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==2) {
+            evt.value=1
+            evt.name="held"
+            evt.descriptionText="${device.displayName} button ${evt.value} held"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==3) {
             evt.value=3
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
@@ -378,13 +394,34 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
         }
+        else if (cmd.keyAttributes==6) {
+            evt.value=9
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
     } else if (cmd.sceneNumber==2) {
         if (cmd.keyAttributes==0) {
             evt.value=2
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
-        } else if (cmd.keyAttributes==3) {
+        }
+        else if (cmd.keyAttributes==1) {
+            evt.value=2
+            evt.name="released"
+            evt.descriptionText="${device.displayName} button ${evt.value} released"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==2) {
+            evt.value=2
+            evt.name="held"
+            evt.descriptionText="${device.displayName} button ${evt.value} held"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==3) {
             evt.value=4
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
@@ -396,6 +433,12 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             sendEvent(evt)
         } else if (cmd.keyAttributes==5) {
             evt.value=8
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==6) {
+            evt.value=10
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
