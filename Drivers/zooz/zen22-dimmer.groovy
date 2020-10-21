@@ -85,7 +85,7 @@ void updated() {
 List<hubitat.zwave.Command> runConfigs() {
     List<hubitat.zwave.Command> cmds=[]
     configParams.each { param, data ->
-        if (settings[data.input.name]) {
+        if (settings[data.input.name] != null) {
             cmds.addAll(configCmd(param, data.parameterSize, settings[data.input.name]))
         }
     }
@@ -95,7 +95,7 @@ List<hubitat.zwave.Command> runConfigs() {
 List<hubitat.zwave.Command> pollConfigs() {
     List<hubitat.zwave.Command> cmds=[]
     configParams.each { param, data ->
-        if (settings[data.input.name]) {
+        if (settings[data.input.name] ) {
             cmds.add(zwave.configurationV1.configurationGet(parameterNumber: param.toInteger()))
         }
     }
