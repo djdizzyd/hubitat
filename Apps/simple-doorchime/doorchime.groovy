@@ -31,13 +31,9 @@ def mainPage() {
 				switch (chimeType) {
 					case "chime":
 						if (chimeDev.hasAttribute("soundEffects")) {
-					    def soundEffectsList = [:]
-						for (soundEffect in chimeDev.currentState("soundEffects").getStringValue().minus("{").minus("}").split(",")) {
-							def effect = soundEffect.split("=")
-							soundEffectsList.put(effect[0],effect[0] + " - " + effect[1]) 
-						}         
-						log.debug "sound effects list: " + soundEffectsList
-						input "soundNum", "enum", title: "Sound to play", options: soundEffectsList, submitOnChange: true, required: true
+							def soundEffectsList = parseJson(chimeDev.currentState("soundEffects").getStringValue())
+							log.debug "sound effects list: " + soundEffectsList
+							input "soundNum", "enum", title: "Sound to play", options: soundEffectsList, submitOnChange: true, required: true
 						} else {
 							input "soundNum", "number", title: "Sound to play", submitOnChange: true, required: true
 						}
