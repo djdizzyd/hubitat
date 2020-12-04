@@ -195,6 +195,10 @@ private void dimmerEvents(hubitat.zwave.Command cmd) {
 void on() {
     state.isDigital=true
     sendToDevice(zwave.basicV1.basicSet(value: 0xFF))
+    Integer level = settings[configParams[18].input.name]?.toInteger()
+    if (level != null && level != 0) {
+        setLevel(level)
+    }
 }
 
 void off() {
@@ -277,13 +281,11 @@ String secureCommand(hubitat.zwave.Command cmd) {
 }
 
 String secureCommand(String cmd) {
-    String encap=""
-    if (getDataValue("zwaveSecurePairingComplete") != "true") {
-        return cmd
+    if (getDataValue("zwaveSecurePairingComplete") == "true" && getDataValue("S2") == null) {
+		return zwave.securityV1.securityMessageEncapsulation().encapsulate(cmd).format()
     } else {
-        encap = "988100"
+		return zwaveSecureEncap(cmd)
     }
-    return "${encap}${cmd}"
 }
 
 void zwaveEvent(hubitat.zwave.Command cmd) {
