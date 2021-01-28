@@ -30,6 +30,8 @@ metadata {
         command "SensorCal", [[name:"calibration",type:"ENUM", description:"Number of degrees to add/subtract from thermostat sensor", constraints:["-3", "-2", "-1", "0", "1", "2", "3"]]]
         command "IdleBrightness", [[name:"brightness",type:"ENUM", description:"Set idle brightness", constraints:["0", "1", "2", "3", "4", "5"]]]
         command "syncClock"
+        command "home"
+        command "away"
 
         fingerprint  mfr:"0039", prod:"0011", deviceId:"0008", inClusters:"0x5E,0x85,0x86,0x59,0x31,0x80,0x81,0x70,0x5A,0x72,0x71,0x73,0x9F,0x44,0x45,0x40,0x42,0x43,0x6C,0x55", deviceJoinName: "Honeywell T6 PRO"
 
@@ -48,6 +50,8 @@ metadata {
 @Field static Map THERMOSTAT_FAN_MODE=[0x00:"auto",0x01:"on",0x02:"auto",0x03:"on",0x04:"auto",0x05:"on",0x06:"circulate",0x07:"circulate"]
 @Field static Map SET_THERMOSTAT_FAN_MODE=["auto":0x00,"on":0x01,"circulate":0x06]
 @Field static Map THERMOSTAT_FAN_STATE=[0x00:"idle", 0x01:"running", 0x02:"running high",0x03:"running medium",0x04:"circulation mode",0x05:"humidity circulation mode",0x06:"right - left circulation mode",0x07:"quiet circulation mode"]
+@Field static Map SET_PRESENCE=["away":0x00, "home":0xFF]
+@Field static Map PRESENCE_VALUE=[0x00:"away",0xFF:"home"]
 @Field static List<String> supportedThermostatFanModes=["on","auto","circulate"]
 @Field static List<String> supportedThermostatModes=["auto", "off", "heat", "emergency heat", "cool"]
 @Field static Map ZWAVE_NOTIFICATION_TYPES=[0:"Reserverd", 1:"Smoke", 2:"CO", 3:"CO2", 4:"Heat", 5:"Water", 6:"Access Control", 7:"Home Security", 8:"Power Management", 9:"System", 10:"Emergency", 11:"Clock", 12:"First"]
@@ -302,6 +306,7 @@ void refresh() {
     cmds.add(zwave.thermostatOperatingStateV1.thermostatOperatingStateGet())
     cmds.add(zwave.thermostatSetpointV2.thermostatSetpointGet(setpointType: 1))
     cmds.add(zwave.thermostatSetpointV2.thermostatSetpointGet(setpointType: 2))
+    cmds.add(zwave.basicV1.basicGet())
     sendToDevice(cmds)
     runIn(10, "syncClock")
 }
@@ -527,6 +532,14 @@ void zwaveEvent(hubitat.zwave.commands.thermostatmodev2.ThermostatModeReport cmd
     state.isDigital=false
 }
 
+void zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
+    if (logEnable) log.debug "Got presence report: ${cmd}"
+    String newmode=PRESENCE_VALUE[cmd.value.toInteger()]
+    if (logEnable) log.debug "Translated presence: " + newmode
+    eventProcess(name: "presence", value: newmode, type: state.isDigital?"digital":"physical")
+    state.isDigital=false
+}
+
 void zwaveEvent(hubitat.zwave.commands.basicv1.BasicSet cmd) {
     // setup basic reports for missed operating state changes
     if (cmd.value.toInteger()==0xFF) {
@@ -622,4 +635,24 @@ void fanCirculate() {
 
 void setSchedule() {
     log.warn "setSchedule is not supported by this driver"
+}
+
+void setPresence(mode) {
+    if (logEnable) log.debug "setPresence($mode))"
+    List<hubitat.zwave.Command> cmds = []
+    if (logEnable) log.debug "setting zwave thermostat presense ${SET_PRESENCE[mode]}"
+    cmds.add(zwave.basicV1.basicSet(value: SET_PRESENCE[mode]))
+    cmds.add(zwave.basicV1.basicGet())
+    state.isDigital=true
+    sendToDevice(cmds)
+}
+
+void home() {
+    state.isDigital=true
+    setPresence("home")
+}
+
+void away() {
+    state.isDigital=true
+    setPresence("away")
 }
