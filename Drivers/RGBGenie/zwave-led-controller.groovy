@@ -580,6 +580,72 @@ void setColorTemperature(temp) {
     sendToDevice(cmds)
 }
 
+void setColorTemperature(temp, level, transitionTime=null) {
+    // Sets the colorTemperature of a device
+    int duration=0
+    if (transitionTime!=null) {
+        duration = transitionTime.toInteger()
+    } else {
+        duration=colorDuration?colorDuration:3
+    }
+    int warmWhite=0
+    int coldWhite=0
+    if (!cwKelvin) {
+        if (temp > COLOR_TEMP_MAX) temp = COLOR_TEMP_MAX
+    } else {
+        if (temp > cwKelvin) temp = cwKelvin
+    }
+    if (!wwKelvin) {
+        if (temp < COLOR_TEMP_MIN) temp = COLOR_TEMP_MIN
+    } else {
+        if (temp < wwKelvin) temp = wwKelvin
+    }
+    List<hubitat.zwave.Command> cmds = []
+    if(logEnable) log.debug "setColorTemperature($temp)"
+    switch (getDataValue("deviceModel")) {
+        case "0":
+            // Single Color Device Type
+            log.trace "setColorTemperature not supported on this device type"
+            return
+            break
+        case "1":
+            // Full CCT Devie Type
+            state.ctTarget=temp
+            warmValue = (((cwKelvin?cwKelvin.toInteger():COLOR_TEMP_MAX) - temp) / COLOR_TEMP_DIFF * 255) as Integer
+            coldValue = 255 - warmValue
+            log.debug "temp: $temp - warm: $warmValue - cold: $coldValue ctDiff: $COLOR_TEMP_DIFF"
+            cmds.add(zwave.switchColorV3.switchColorSet(warmWhite: warmValue, coldWhite: coldValue, dimmingDuration: duration))
+            break
+        case "2":
+            // RGBW Device type
+            if (wwComponent) {
+                // LED strip has warm white
+                if(temp < wwKelvin) temp = wwKelvin
+                state.ctTarget=temp
+                int warmValue = ((COLOR_TEMP_MAX - temp) / COLOR_TEMP_DIFF_RGBW * 255) as Integer
+                int coldValue = 255 - warmValue
+                Map rgbTemp = ctToRgb(6500)
+                cmds.add(zwave.switchColorV3.switchColorSet(red: gammaCorrect(coldValue), green: gammaCorrect(Math.round(coldValue*0.9765)), blue: gammaCorrect(Math.round(coldValue*0.9922)), warmWhite: gammaCorrect(warmValue), dimmingDuration: duration))
+            } else {
+                // LED strip is RGB and has no white
+                Map rgbTemp = ctToRgb(temp)
+                state.ctTarget=temp
+                if(logEnable) log.debug "r: " + rgbTemp["r"] + " g: " + rgbTemp["g"] + " b: "+ rgbTemp["b"]
+                if(logEnable) log.debug "r: " + gammaCorrect(rgbTemp["r"]) + " g: " + gammaCorrect(rgbTemp["g"]) + " b: " + gammaCorrect(rgbTemp["b"])
+                cmds.add(zwave.switchColorV3.switchColorSet(red: gammaCorrect(rgbTemp["r"]), green: gammaCorrect(rgbTemp["g"]), blue: gammaCorrect(rgbTemp["b"]), warmWhite: 0, dimmingDuration: duration))
+            }
+            break
+    }
+    if (level == null) { level = device.currentValue("level").toInteger() }
+    if(level > 99) level = 99
+    cmds.add(zwave.switchMultilevelV3.switchMultilevelSet(value: level.shortValue(), dimmingDuration: dimmingDuration))
+    cmds.add(zwave.switchMultilevelV3.switchMultilevelGet())
+    cmds.addAll(queryAllColors())
+    eventProcess(name: "colorMode", value: "CT")
+    log.debug(cmds)
+    sendToDevice(cmds)
+}
+
 private List<hubitat.zwave.Command> queryAllColors() {
     List<hubitat.zwave.Command> cmds=[]
     switch (getDataValue("deviceModel")) {
