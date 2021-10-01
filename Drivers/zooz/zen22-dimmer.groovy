@@ -15,6 +15,8 @@ metadata {
         capability "Configuration"
         capability "ChangeLevel"
         capability "PushableButton"
+        capability "HoldableButton"
+        capability "ReleasableButton"
         capability "Indicator"
 
         fingerprint mfr:"027A", prod:"B112", deviceId:"1F1C", inClusters:"0x5E,0x26,0x85,0x8E,0x59,0x55,0x86,0x72,0x5A,0x73,0x70,0x5B,0x9F,0x6C,0x7A", deviceJoinName: "Zooz Zen22 Dimmer" //US
@@ -31,9 +33,9 @@ metadata {
         1: [input: [name: "configParam1", type: "enum", title: "On/Off Paddle Orientation", description: "", defaultValue: 0, options: [0:"Normal",1:"Reverse",2:"Any paddle turns on/off"]], parameterSize: 1],
         2: [input: [name: "configParam2", type: "enum", title: "LED Indicator Control", description: "", defaultValue: 0, options: [0:"Indicator is on when switch is off",1:"Indicator is on when switch is on",2:"Indicator is always off",3:"Indicator is always on"]], parameterSize: 1],
         3: [input: [name: "configParam3", type: "enum", title: "Auto Turn-Off Timer", description: "", defaultValue: 0, options: [0:"Timer disabled",1:"Timer Enabled"]], parameterSize: 1],
-        4: [input: [name: "configParam4", type: "number", title: "Auto Off Timer", description: "Minutes 1-65535", defaultValue: 60, range:"1..65535"], parameterSize:4],
+        4: [input: [name: "configParam4", type: "number", title: "Auto Off Timer", description: "Minutes 0-65535", defaultValue: 60, range:"0..65535"], parameterSize:4],
         5: [input: [name: "configParam5", type: "enum", title: "Auto Turn-On Timer", description: "", defaultValue: 0, options: [0:"timer disabled",1:"timer enabled"]],parameterSize:1],
-        6: [input: [name: "configParam6", type: "number", title: "Auto On Timer", description: "Minutes 1-65535", defaultValue: 60, range:"1..65535"], parameterSize: 4],
+        6: [input: [name: "configParam6", type: "number", title: "Auto On Timer", description: "Minutes 0-65535", defaultValue: 60, range:"0..65535"], parameterSize: 4],
         7: [input: [name: "configParam7", type: "enum", title: "Association Reports", description: "", defaultValue: 15, options:[0:"none",1:"physical tap on ZEN27 only",2:"physical tap on 3-way switch only",3:"physical tap on ZEN27 or 3-way switch",4:"Z-Wave command from hub",5:"physical tap on ZEN27 or Z-Wave command",6:"physical tap on connected 3-way switch or Z-wave command",7:"physical tap on ZEN27 / 3-way switch / or Z-wave command",8:"timer only",9:"physical tap on ZEN27 or timer",10:"physical tap on 3-way switch or timer",11:"physical tap on ZEN 27 / 3-way switch or timer",12:"Z-wave command from hub or timer",13:"physical tap on ZEN27, Z-wave command, or timer",14:"physical tap on ZEN27 / 3-way switch / Z-wave command, or timer", 15:"all of the above"]],parameterSize:1],
         8: [input: [name: "configParam8", type: "enum", title: "On/Off Status After Power Failure", description: "", defaultValue: 2, options:[0:"Off",1:"On",2:"Last State"]],parameterSize:1],
         9: [input: [name: "configParam9", type: "number", title: "Ramp Rate Control", description: "Seconds: 0-99", defaultValue: 1, range:"0..99"], parameterSize:1],
@@ -83,7 +85,7 @@ void updated() {
 List<hubitat.zwave.Command> runConfigs() {
     List<hubitat.zwave.Command> cmds=[]
     configParams.each { param, data ->
-        if (settings[data.input.name]) {
+        if (settings[data.input.name] != null) {
             cmds.addAll(configCmd(param, data.parameterSize, settings[data.input.name]))
         }
     }
@@ -93,7 +95,7 @@ List<hubitat.zwave.Command> runConfigs() {
 List<hubitat.zwave.Command> pollConfigs() {
     List<hubitat.zwave.Command> cmds=[]
     configParams.each { param, data ->
-        if (settings[data.input.name]) {
+        if (settings[data.input.name] ) {
             cmds.add(zwave.configurationV1.configurationGet(parameterNumber: param.toInteger()))
         }
     }
@@ -134,7 +136,7 @@ void pollDeviceData() {
     cmds.add(zwave.manufacturerSpecificV2.deviceSpecificGet(deviceIdType: 1))
     cmds.addAll(processAssociations())
     cmds.addAll(pollConfigs())
-    sendEvent(name: "numberOfButtons", value: 8)
+    sendEvent(name: "numberOfButtons", value: 10)
     sendToDevice(cmds)
 }
 
@@ -193,6 +195,10 @@ private void dimmerEvents(hubitat.zwave.Command cmd) {
 void on() {
     state.isDigital=true
     sendToDevice(zwave.basicV1.basicSet(value: 0xFF))
+    Integer level = settings[configParams[18].input.name]?.toInteger()
+    if (level != null && level != 0) {
+        setLevel(level)
+    }
 }
 
 void off() {
@@ -275,13 +281,11 @@ String secureCommand(hubitat.zwave.Command cmd) {
 }
 
 String secureCommand(String cmd) {
-    String encap=""
-    if (getDataValue("zwaveSecurePairingComplete") != "true") {
-        return cmd
+    if (getDataValue("zwaveSecurePairingComplete") == "true" && getDataValue("S2") == null) {
+		return zwave.securityV1.securityMessageEncapsulation().encapsulate(cmd).format()
     } else {
-        encap = "988100"
+		return zwaveSecureEncap(cmd)
     }
-    return "${encap}${cmd}"
 }
 
 void zwaveEvent(hubitat.zwave.Command cmd) {
@@ -362,6 +366,20 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==1) {
+            evt.value=1
+            evt.name="released"
+            evt.descriptionText="${device.displayName} button ${evt.value} released"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==2) {
+            evt.value=1
+            evt.name="held"
+            evt.descriptionText="${device.displayName} button ${evt.value} held"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
         } else if (cmd.keyAttributes==3) {
             evt.value=3
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
@@ -378,13 +396,34 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
         }
+        else if (cmd.keyAttributes==6) {
+            evt.value=9
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
     } else if (cmd.sceneNumber==2) {
         if (cmd.keyAttributes==0) {
             evt.value=2
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
-        } else if (cmd.keyAttributes==3) {
+        }
+        else if (cmd.keyAttributes==1) {
+            evt.value=2
+            evt.name="released"
+            evt.descriptionText="${device.displayName} button ${evt.value} released"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==2) {
+            evt.value=2
+            evt.name="held"
+            evt.descriptionText="${device.displayName} button ${evt.value} held"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==3) {
             evt.value=4
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
@@ -396,6 +435,12 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             sendEvent(evt)
         } else if (cmd.keyAttributes==5) {
             evt.value=8
+            evt.descriptionText="${device.displayName} button ${evt.value} pushed"
+            if (txtEnable) log.info evt.descriptionText
+            sendEvent(evt)
+        }
+        else if (cmd.keyAttributes==6) {
+            evt.value=10
             evt.descriptionText="${device.displayName} button ${evt.value} pushed"
             if (txtEnable) log.info evt.descriptionText
             sendEvent(evt)
