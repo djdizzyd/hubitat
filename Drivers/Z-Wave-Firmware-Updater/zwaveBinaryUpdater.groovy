@@ -1,8 +1,8 @@
-// v1.00
+// v1.01 fix off-by-one error
 import groovy.transform.Field
 
 metadata {
-    definition (name: "Z-Wave Firmware Updater",namespace: "djdizzyd", author: "Bryan Copeland") {
+    definition (name: "Z-Wave Firmware Updater",namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Z-Wave-Firmware-Updater/zwaveBinaryUpdater.groovy") {
         attribute "currentFirmwareVersion", "string"
         attribute "firmwareUpdateProgress", "string"
         attribute "firmwareUploadPercent", "string"
@@ -155,7 +155,7 @@ void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareUpdateMdGet cm
     if (device.currentValue("firmwareUploadPercent") != "${percent}%") {
         sendEvent(name: "firmwareUploadPercent", value: "${percent}%")
     }
-    if (lastByte >= byteBuffer.size()-1) {
+    if (lastByte >= byteBuffer.size()) {
         lastReport=true
         lastByte = byteBuffer.size()
     }
