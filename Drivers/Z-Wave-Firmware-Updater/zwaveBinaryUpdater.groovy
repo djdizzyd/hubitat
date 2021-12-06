@@ -1,5 +1,8 @@
 // v1.01 fix off-by-one error
 import groovy.transform.Field
+import java.util.concurrent.ConcurrentHashMap
+import java.util.TreeMap
+import java.security.MessageDigest
 
 metadata {
     definition (name: "Z-Wave Firmware Updater",namespace: "djdizzyd", author: "Bryan Copeland", importUrl: "https://raw.githubusercontent.com/djdizzyd/hubitat/master/Drivers/Z-Wave-Firmware-Updater/zwaveBinaryUpdater.groovy") {
@@ -11,16 +14,32 @@ metadata {
         attribute "firmwareTarget", "number"
         attribute "firmwareFragmentSize", "number"
         attribute "lockedBy", "string"
+        attribute "storedParameters", "string"
+        attribute "storedParameterCount", "number"
 
         command "clearLock"
+        command "getParameters", [[name: "parameterNumbers*", type: "STRING", description: "Range of property numbers to store. Use , as a separator, and - for ranges."],
+                                  [name: "interval", type: "INTEGER", description: "Number of milliseconds to wait between consecutive zwave commands. Too slow and it will take a long time. Too fast and some commands may be dropped.", defaultValue: 200]]
+        command "restoreParameters", [[name: "parameterNumbers", type: "STRING", description: "Range of property numbers to set to their cached value. Use , as a separator, and - for ranges. Leave blank to restore all that are stored."],
+                                      [name: "interval", type: "INTEGER", description: "Number of milliseconds to wait between consecutive zwave commands. Too slow and it will take a long time. Too fast and some commands may be dropped.", defaultValue: 200]]
+        command "setParameter", [[name:"parameterNumber",type:"INTEGER", description:"Parameter Number"],
+                                 [name:"size",type:"ENUM", description:"Parameter Size", constraints:["1", "2", "4"]],
+                                 [name:"value",type:"INTEGER", description:"Parameter Value"]]
         command "getVersionReport"
         command "abortProcess"
-        command "updateFirmware", [[name:"binaryFirmwareUrl", type: "STRING", description:"Firmware URL"],[name:"firmwareTarget", type: "ENUM", description: "Firmware Target", constraints: ["0","1","2","3","4","5"]]]
+        command "updateFirmware", [[name:"binaryFirmwareUrl*", type: "STRING", description:"Firmware URL"],
+                                   [name:"firmwareTarget", type: "ENUM", description: "Firmware Target", constraints: ["0","1","2","3","4","5"]],
+                                   [name: "md5", type: "STRING", description: "MD5 checksum of firmware file. If set, update will abort if the downloaded file doesn't match this checksum"]
+        ]
     }
     preferences {
         input name: "debugEnable", type: "bool", description: "", title: "Enable Debug Logging", defaultVaule: false
+        input name: "sleepyTimeout", type: "integer", description: "The number of seconds to wait for the device to respond before deciding that the device must be asleep.", defaultValue: 5
     }
 }
+@Field static ConcurrentHashMap<Integer, Integer> parameterValues = new ConcurrentHashMap(32)
+@Field static ConcurrentHashMap<Integer, Integer> parameterSizes = new ConcurrentHashMap(32)
+
 @Field static Map CMD_CLASS_VERS=[0x85:1,0x86:1,0x7A:3]
 @Field static String lockedBy="none"
 @Field static String lockedByName=""
@@ -38,6 +57,8 @@ metadata {
 @Field static String theFirmwareUpdateUrl
 @Field static Boolean locked=false
 @Field static Boolean abort=false
+@Field static String expectedMd5Sum = null
+@Field static Integer timeout = 5
 
 @Field static Map firmwareUpdateMdStatus=[
         0:"The device was unable to receive the requested firmware data without checksum error",
@@ -79,7 +100,62 @@ metadata {
 
 void updated() {}
 
+List<Integer> parseRange(String range) {
+//    log.debug "range $range"
+    List<Integer> split = range.split(',').collect{it.trim()}.collect {
+        it.contains('-') ? it.split('-')[0].toInteger()..it.split('-')[1].toInteger() : it.toInteger()
+    }.flatten()
+//    log.debug "split $split"
+    split
+}
 
+List<String> getParameters(String range, Integer interval = null) {
+    interval = interval ?: 200
+    List<Integer> parameterNumbers = parseRange(range)
+    log.info "getting current values for parameters $parameterNumbers"
+    List<String> cmds = parameterNumbers.collect{zwaveSecureEncap(zwave.configurationV1.configurationGet(parameterNumber: it))}
+    log.debug cmds
+    delayBetween(cmds, interval)
+}
+
+List<String> setParameter(Integer parameterNumber, Integer size, Integer value){
+    log.debug("set parameter number $parameterNumber with size $size to $value")
+    delayBetween([
+            zwaveSecureEncap(zwave.configurationV1.configurationSet(scaledConfigurationValue: value, parameterNumber: parameterNumber, size: size)),
+            zwaveSecureEncap(zwave.configurationV1.configurationGet(parameterNumber: parameterNumber))
+    ],500)
+}
+
+List<String> restoreParameters(String range, Integer interval = null) {
+    interval = interval ?: 200
+    List<Integer> parameterNumbers = parseRange(range).findAll{parameterValues.containsKey(it) && parameterSizes.containsKey(it)}
+    log.info "restoring stored values for parameters $parameterNumbers"
+    List<String> cmds = parameterNumbers.collect{
+        Integer size = parameterSizes.get(it)
+        Integer value = parameterValues.get(it)
+        log.debug("set parameter number $it with size $size to $value")
+        [
+                zwaveSecureEncap(zwave.configurationV1.configurationSet(scaledConfigurationValue: value, parameterNumber: it, size: size)),
+                zwaveSecureEncap(zwave.configurationV1.configurationGet(parameterNumber: it))
+        ]
+    }.flatten()
+    delayBetween(cmds, interval)
+}
+
+
+void zwaveEvent(hubitat.zwave.commands.configurationv1.ConfigurationReport cmd) {
+    unschedule('showStoredParameters')
+    log.info "ConfigurationReport- parameterNumber:${cmd.parameterNumber}, size:${cmd.size}, value:${cmd.scaledConfigurationValue}"
+    parameterValues.put(cmd.parameterNumber as Integer, cmd.scaledConfigurationValue as Integer)
+    parameterSizes.put(cmd.parameterNumber as Integer, cmd.size as Integer)
+    runIn(3, 'showStoredParameters')
+}
+
+void showStoredParameters() {
+    TreeMap<Integer, Integer> sortedParameters = new TreeMap(parameterValues)
+    sendEvent(name: "storedParameters", value: sortedParameters.toString())
+    sendEvent(name: "storedParameterCount", value: sortedParameters.size())
+}
 
 void clearLock() {
     memoryCleanup()
@@ -117,7 +193,7 @@ void zwaveEvent(hubitat.zwave.commands.versionv1.VersionReport cmd) {
     if (theFirmwareUpdateUrl != "") {
         if (!abort) {
             sendEvent (name: "firmwareUpdateProgress", value: "Getting firmware meta data...")
-            runIn(5,'wakeUp')
+            runIn(timeout,'wakeUp')
             sendToDevice(zwave.firmwareUpdateMdV3.firmwareMdGet())
         }
     }
@@ -129,7 +205,7 @@ void zwaveEvent(hubitat.zwave.commands.versionv1.VersionCommandClassReport cmd) 
         log.info "FirmwareUpdateMd version:${cmd.commandClassVersion}"
         firmwareUpdateMdVersion=cmd.commandClassVersion
         if (!abort) {
-            runIn(5,'wakeUp')
+            runIn(timeout,'wakeUp')
             sendToDevice(zwave.versionV1.versionGet())
         }
     } else {
@@ -173,7 +249,7 @@ void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareUpdateMdGet cm
     String newcmd=""
     bytes.each { newcmd+=hubitat.helper.HexUtils.integerToHexString(it & 0xff,1).padLeft(2, '0')}
     if (firmwareUpdateMdVersion>1) {
-        int crc = zwaveCrc16(bytes)
+        Integer crc = zwaveCrc16(bytes)
         newcmd+=hubitat.helper.HexUtils.integerToHexString(crc,1).padLeft(4, '0')
     }
     if(!abort) sendToDevice(newcmd)
@@ -192,7 +268,7 @@ void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareUpdateMdStatus
             case 253:
                 // need to activate
                 log.info firmwareUpdateMdStatus[cmd.status as Integer]
-                runIn(5,'wakeUp')
+                runIn(timeout,'wakeUp')
                 response(activateFirmwareImage)
                 break
             case 254:
@@ -270,9 +346,9 @@ void memoryCleanup() {
 
 void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareMdReport cmd) {
     unschedule('wakeUp')
+    unschedule('firmwareStore')
     updateProgress("got device current metadata")
     if (debugEnable) log.debug "FirmwareMDReport: ${cmd}"
-    if (debugEnable) log.debug "firmwareMdReport: checksum ${cmd.checksum} firmwareId: ${cmd.firmwareId} manufacturerId: ${cmd.manufacturerId} maxFragmentSize: ${cmd.maxFragmentSize} firmwareTargets: ${cmd.numberOfTargets}"
     firmwareTargets[cmd.firmwareId] = 0
     if (theFirmwareTarget==0) firmwareDescriptor['firmwareId']=cmd.firmwareId
     int target=1
@@ -294,7 +370,7 @@ void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareMdReport cmd) 
         firmwareMdInfo['maxFragmentSize']=cmd.maxFragmentSize
     }
     sendEvent(name: "firmwareFragmentSize", value: firmwareMdInfo['maxFragmentSize'])
-    if (!abort) runIn(1, "firmwareStore")
+    if (!abort) runIn(2, "firmwareStore")
 }
 
 void updateProgress(message) {
@@ -427,6 +503,17 @@ void parseFirmwareImage() {
         }
         if (hexString) {
             log.debug "Buffer is hex processing hex..."
+            String md5 = MessageDigest.getInstance("MD5").digest(hexString.bytes).encodeHex().toString()
+            log.info "firmware image has md5 sum $md5"
+            if (expectedMd5Sum) {
+                log.debug("comparing firmware image to expected md5 sum $expectedMd5Sum")
+                if (md5 != expectedMd5Sum) {
+                    log.error "Firmware download corrupted. Aborting."
+                    abort = true
+                    sendEvent(name: "firmwareUpdateProgress", description: "ABORTED: The downloaded firmware didn't match the expected md5 checksum. Try again?")
+                    throw new GroovyRuntimeException("Firmware checksum mismatch")
+                }
+            }
             int byteCursor = 0
             int byteCursorPad = 0
             updateProgress("Parsing firmware...")
@@ -444,7 +531,7 @@ void parseFirmwareImage() {
                             Integer bytesToPad = newByteCursor - byteCursor
                             byte[] padBytes = new byte[bytesToPad - 1]
                             newByteBuffer.write(padBytes)
-                            log.debug "Paadded ${bytesToPad} bytes of data"
+                            log.debug "Padded ${bytesToPad} bytes of data"
                             byteCursor=newByteCursor
                         }
                         byte[] byteChunk = hubitat.helper.HexUtils.hexStringToByteArray(data)
@@ -478,7 +565,7 @@ void parseFirmwareImage() {
         }
     }
 
-thefirmwareUpdateUrl = ""
+    thefirmwareUpdateUrl = ""
 }
 
 void parseFirmwareDescriptor(List<Byte> descriptorBytes) {
@@ -534,7 +621,7 @@ void firmwareStore() {
         if (firmwareUpdateMdVersion>3) rawpacket+="00" // activate firmware
         if (debugEnable) log.debug rawpacket
         if (!abort) {
-            runIn(5,'wakeUp')
+            runIn(timeout,'wakeUp')
             sendToDevice(rawpacket)
         }
 
@@ -581,7 +668,7 @@ void firmwareStore() {
         if (firmwareUpdateMdVersion>3) rawpacket+="00" // activate firmware
         if (debugEnable) log.debug rawpacket
         if (!abort) {
-            runIn(5,'wakeUp')
+            runIn(timeout,'wakeUp')
             sendToDevice(rawpacket)
         }
     } else {
@@ -592,10 +679,11 @@ void firmwareStore() {
     }*/
 }
 
-void updateFirmware(String firmwareUrl, String firmwareTarget) {
+void updateFirmware(String firmwareUrl, String firmwareTarget, String md5Sum = null) {
     if (!locked) {
         abort=false
         locked=true
+        expectedMd5Sum = md5Sum
         lockedBy=device.getDeviceNetworkId()
         lockedByName=device.getDisplayName()
         newByteBuffer.reset()
@@ -608,7 +696,7 @@ void updateFirmware(String firmwareUrl, String firmwareTarget) {
         sendEvent(name: "manufacturerId", value:"")
         sendEvent(name: "firmwareTarget", value:null)
         updateProgress("Starting.. Getting current version")
-        runIn(5, 'wakeUp')
+        runIn(timeout, 'wakeUp')
         sendToDevice(zwave.versionV1.versionCommandClassGet(requestedCommandClass:0x7A))
     } else {
         crossDeviceLock()
@@ -658,7 +746,9 @@ void getVersionReport(){
 
 void installed(){}
 
-void configure() {}
+void configure() {
+    timeout = sleepyTimeout ?: timeout
+}
 
 void zwaveEvent(hubitat.zwave.commands.securityv1.SecurityMessageEncapsulation cmd) {
     hubitat.zwave.Command encapsulatedCommand = cmd.encapsulatedCommand(CMD_CLASS_VERS)
@@ -680,27 +770,13 @@ void sendToDevice(List<hubitat.zwave.Command> cmds) {
 }
 
 void sendToDevice(hubitat.zwave.Command cmd) {
-    sendHubCommand(new hubitat.device.HubAction(secureCommand(cmd), hubitat.device.Protocol.ZWAVE))
+    sendHubCommand(new hubitat.device.HubAction(zwaveSecureEncap(cmd), hubitat.device.Protocol.ZWAVE))
 }
 
 void sendToDevice(String cmd) {
-    sendHubCommand(new hubitat.device.HubAction(secureCommand(cmd), hubitat.device.Protocol.ZWAVE))
+    sendHubCommand(new hubitat.device.HubAction(zwaveSecureEncap(cmd), hubitat.device.Protocol.ZWAVE))
 }
 
 List<String> commands(List<hubitat.zwave.Command> cmds, Long delay=200) {
-    return delayBetween(cmds.collect{ secureCommand(it) }, delay)
-}
-
-String secureCommand(hubitat.zwave.Command cmd) {
-    secureCommand(cmd.format())
-}
-
-String secureCommand(String cmd) {
-    String encap=""
-    if (getDataValue("zwaveSecurePairingComplete") != "true") {
-        return cmd
-    } else {
-        encap = "988100"
-    }
-    return "${encap}${cmd}"
+    return delayBetween(cmds.collect{ zwaveSecureEncap(it) }, delay)
 }
