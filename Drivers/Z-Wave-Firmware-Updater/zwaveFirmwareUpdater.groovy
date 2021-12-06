@@ -1,4 +1,4 @@
-// v1.00
+// v1.01 fix off-by-one error
 import groovy.transform.Field
 
 metadata {
@@ -152,7 +152,7 @@ void zwaveEvent(hubitat.zwave.commands.firmwareupdatemdv3.FirmwareUpdateMdGet cm
     if (device.currentValue("firmwareUploadPercent") != "${percent}%") {
         sendEvent(name: "firmwareUploadPercent", value: "${percent}%")
     }
-    if (lastByte >= byteBuffer.size()-1) {
+    if (lastByte >= byteBuffer.size()) {
         lastReport=true
         lastByte = byteBuffer.size()
     }
