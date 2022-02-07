@@ -31,18 +31,21 @@ def mainPage() {
 				switch (chimeType) {
 					case "chime":
 						if (chimeDev.hasAttribute("soundEffects")) {
-							def soundEffectsList = parseJson(chimeDev.currentState("soundEffects").getStringValue())
-							log.debug "sound effects list: " + soundEffectsList
-							input "soundNum", "enum", title: "Sound to play", options: soundEffectsList, submitOnChange: true, required: true
-						} else {
-							input "soundNum", "number", title: "Sound to play", submitOnChange: true, required: true
+                            def soundEffectsList = chimeDev.currentState("soundEffects").value
+                            if(enableLog==null) {log.debug "sound effects list: " + soundEffectsList
+                                                } else {
+                                if(enableLog) log.debug "sound effects list: " + soundEffectsList
+                            }
+							input "soundNum", "number", title: "Sound to play", submitOnChange: false, required: true
 						}
 						break;
 					case "speechSynthesis":
-						input "speakText", "text", title: "Text to speak", submitOnChange: true, required: true
+						input "speakText", "text", title: "Text to speak", submitOnChange: false, required: true
 						break;
 				}
 			}
+            input "useHSM", "enum", title: "Use HSM Status for Chime?", options: ["disUse": "No", "disArmed": "Only when Disarmed"], submitOnChange: false, defaultValue: "No"
+            input "enableLog", "bool", title: "Enable Logging", submitOnChange: false, required: true, defaultValue: true
 		}
 	}
 }
@@ -58,45 +61,70 @@ def updated() {
 }
 
 def initialize() {
-    log.debug "initializing"
+    if(enableLog) log.debug "initializing"
     for (dev in contactDev) {
-        log.debug "subscribing to " + dev.getDisplayName()
+        if(enableLog) log.debug "subscribing to " + dev.getDisplayName()
 	    subscribe(dev, "contact.open", handler)
-    }
+        }
+    if (useHSM=="disArmed") { 
+            if(enableLog) log.debug "subscribing to HSM Status"
+            subscribe(location, "hsmStatus", statusHandler)
+            }
 }
 
-def handler(evt) {
+def handler(evt) { 
+    if(useHSM=="disArmed") {
+        if(location.hsmStatus=="allDisarmed") {
 	if (debounce) {
 		runInMillis(delayTime, debounced, [data: [o: evt.value, d: evt.device.getDisplayName()]])
-		log.info "Contact $evt.device $evt.value, start delay of $delayTime milliseconds"
+		if(enableLog) log.info "Contact $evt.device $evt.value, start delay of $delayTime milliseconds"
+	} else {
+		debounced([o: evt.value, d: evt.device.getDisplayName()])
+	}
+        } else {
+            if(location.hsmStatus=="disarmed") {
+            	if (debounce) {
+		runInMillis(delayTime, debounced, [data: [o: evt.value, d: evt.device.getDisplayName()]])
+		if(enableLog) log.info "Contact $evt.device $evt.value, start delay of $delayTime milliseconds"
 	} else {
 		debounced([o: evt.value, d: evt.device.getDisplayName()])
 	}
 }
+    }
+    } else {
+                    	if (debounce) {
+		runInMillis(delayTime, debounced, [data: [o: evt.value, d: evt.device.getDisplayName()]])
+		if(enableLog) log.info "Contact $evt.device $evt.value, start delay of $delayTime milliseconds"
+    } else {
+		debounced([o: evt.value, d: evt.device.getDisplayName()])
+                        }
+    }
+}
 
 def debounced(data) {
 	if(data.o == "open") {
-		log.info "Contact $data.d debounced chiming" +  chimeDev.getDisplayName() + " sound number $soundNum"
+		if(enableLog) log.info "Contact $data.d debounced chiming" +  chimeDev.getDisplayName() + " sound number $soundNum"
 		chimeAction()
 	} 
 }
+                        
 
 def chimeAction() {
-	log.debug "Chime Action"
+	log.info "Chime Action"
 	switch(chimeType) {
 		case("chime"): 
 			//chime Type
-			log.debug "playing sound: $soundNum on " + chimeDev.getDisplayName()
+			if(enableLog) log.debug "playing sound: $soundNum on " + chimeDev.getDisplayName()
 			chimeDev.playSound(soundNum.toInteger())
 			break;
 		case("speechSynthesis"):
 			// speech Type
-			log.debug "Speaking '$speakText' on " + chimeDev.getDisplayName()
+			if(enableLog) log.debug "Speaking '$speakText' on " + chimeDev.getDisplayName()
 			chimeDev.speak(speakText)
 			break;
 		case("tone"):
 			// tone Type
-			log.debug "Sending beep to " + chimeDev.getDisplayName()
+			if(enableLog) log.debug "Sending beep to " + chimeDev.getDisplayName()
 			chimeDev.beep()
 			break;
 	}
