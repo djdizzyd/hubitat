@@ -368,4 +368,21 @@ void zwaveEvent(hubitat.zwave.commands.centralscenev3.CentralSceneNotification c
             sendEvent(evt)
         }
     }
+    
+    /**
+        Handles Push Button events from the Device details which sends them as BigDecimal
+    **/
+    void push(BigDecimal button){
+        Map evt = [name: "pushed", type:"digital", isStateChange:true]
+        evt.value = button
+        evt.descriptionText = "${device.displayName} button ${evt.value} pushed"
+        sendEvent(evt)
+    }
+
+    /**
+        Handles Push Button events from Rule Machine which sends them as Long
+    **/
+    void push(Long button){
+        push(new BigDecimal(button));
+    }
 }
